@@ -1,6 +1,8 @@
+consistof "std.rv"
+
 riven core {
 
-    import "std.rv"
+    stamp("Riven V1")
 
     numbers = [5, 10, 15]
 
