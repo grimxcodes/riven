@@ -166,6 +166,22 @@ Token get_next_token() {
 
     }
 
+    if (current() == '+') {
+
+        advance();
+
+        return make_token(TOKEN_PLUS, "+");
+
+    }
+
+    if (current() == '-') {
+
+        advance();
+
+        return make_token(TOKEN_MINUS, "-");
+
+    }
+
     if (current() == '{') {
 
         advance();
