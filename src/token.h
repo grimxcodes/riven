@@ -13,9 +13,11 @@ typedef enum {
     TOKEN_STAMP,
 
     TOKEN_IF,
+    TOKEN_ELSE,
     TOKEN_FLOW,
 
     TOKEN_CRAFT,
+    TOKEN_RETURN,
 
     TOKEN_PLUS,
     TOKEN_MINUS,
@@ -31,6 +33,8 @@ typedef enum {
 
     TOKEN_LBRACE,
     TOKEN_RBRACE,
+
+    TOKEN_COMMA,
 
     TOKEN_EOF
 
