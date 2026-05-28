@@ -1,13 +1,16 @@
-CC = gcc
+CC=gcc
 
-SRC = src/main.c \
-      src/lexer.c \
-      src/parser.c \
-      src/runtime.c \
-      src/ast.c \
-      src/executor.c
+SRC=src/main.c \
+src/lexer.c \
+src/parser.c \
+src/runtime.c \
+src/ast.c \
+src/executor.c
 
-OUT = rvn
+OUT=rvn
 
 all:
 	$(CC) $(SRC) -o $(OUT)
+
+clean:
+	rm -f $(OUT)
