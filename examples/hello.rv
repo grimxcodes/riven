@@ -14,15 +14,15 @@ riven core {
 
     }
 
-    craft loopTest(limit) {
+    craft countdown(limit) {
 
-        i = 0
+        i = limit
 
-        flow i < limit {
+        flow i > 0 {
 
             stamp(i)
 
-            i = i + 1
+            i = i - 1
 
         }
 
@@ -32,23 +32,23 @@ riven core {
 
     add(5)
 
-    loopTest(3)
+    countdown(5)
 
-    x = 20
+    x = 100
 
-    y = x + 30
+    y = x - 50
 
     stamp(y)
 
     if y == 50 {
 
-        stamp("correct")
+        stamp("half")
 
     }
 
-    if y > 10 {
+    if y < 100 {
 
-        stamp("big")
+        stamp("smaller")
 
     }
 
