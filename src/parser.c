@@ -27,6 +27,38 @@ static void eat(TokenType type) {
 
 }
 
+static int get_number_value() {
+
+    int value = 0;
+
+    if (current_token.type == TOKEN_NUMBER) {
+
+        value = atoi(current_token.value);
+
+        eat(TOKEN_NUMBER);
+
+    }
+
+    else if (current_token.type == TOKEN_IDENTIFIER) {
+
+        value = atoi(runtime_get_variable(current_token.value));
+
+        eat(TOKEN_IDENTIFIER);
+
+    }
+
+    else {
+
+        printf("Expected number\n");
+
+        exit(1);
+
+    }
+
+    return value;
+
+}
+
 static void parse_variable() {
 
     char* name = strdup(current_token.value);
@@ -35,33 +67,47 @@ static void parse_variable() {
 
     eat(TOKEN_ASSIGN);
 
-    char* value;
-
     if (current_token.type == TOKEN_STRING) {
 
-        value = strdup(current_token.value);
+        char* value = strdup(current_token.value);
 
         eat(TOKEN_STRING);
 
-    }
-
-    else if (current_token.type == TOKEN_NUMBER) {
-
-        value = strdup(current_token.value);
-
-        eat(TOKEN_NUMBER);
+        runtime_set_variable(name, value);
 
     }
 
     else {
 
-        printf("Invalid variable value\n");
+        int left = get_number_value();
 
-        exit(1);
+        if (current_token.type == TOKEN_PLUS) {
+
+            eat(TOKEN_PLUS);
+
+            int right = get_number_value();
+
+            left = left + right;
+
+        }
+
+        else if (current_token.type == TOKEN_MINUS) {
+
+            eat(TOKEN_MINUS);
+
+            int right = get_number_value();
+
+            left = left - right;
+
+        }
+
+        char result[100];
+
+        sprintf(result, "%d", left);
+
+        runtime_set_variable(name, result);
 
     }
-
-    runtime_set_variable(name, value);
 
 }
 
