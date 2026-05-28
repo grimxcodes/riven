@@ -8,38 +8,52 @@ riven core {
 
     }
 
-    craft test(n) {
+    craft double(x) {
 
-        if n > 5 {
+        result = x + x
 
-            stamp("big")
+        return result
+
+    }
+
+    craft complex(n) {
+
+        temp = double(n)
+
+        final = add(temp, 5)
+
+        return final
+
+    }
+
+    value = complex(10)
+
+    stamp(value)
+
+    if value == 25 {
+
+        stamp("nested returns work")
+
+    }
+
+    i = 5
+
+    flow i > 0 {
+
+        if i > 2 {
+
+            stamp(i)
 
         }
 
         else {
 
-            stamp("small")
+            stamp("low")
 
         }
 
-        i = 0
-
-        flow i < n {
-
-            stamp(i)
-
-            i = i + 1
-
-        }
+        i = i - 1
 
     }
-
-    value = add(7, 8)
-
-    stamp(value)
-
-    test(3)
-
-    test(8)
 
 }
