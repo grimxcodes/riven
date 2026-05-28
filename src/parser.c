@@ -35,9 +35,7 @@ static ASTNode* parse_expression();
 static ASTNode* parse_number() {
 
     ASTNode* node =
-        create_node(
-            NODE_NUMBER
-        );
+        create_node(NODE_NUMBER);
 
     node->value =
         strdup(current_token.value);
@@ -51,9 +49,7 @@ static ASTNode* parse_number() {
 static ASTNode* parse_variable() {
 
     ASTNode* node =
-        create_node(
-            NODE_VARIABLE
-        );
+        create_node(NODE_VARIABLE);
 
     node->name =
         strdup(current_token.value);
@@ -103,9 +99,7 @@ static ASTNode* parse_expression() {
     ) {
 
         ASTNode* op =
-            create_node(
-                NODE_BINARY
-            );
+            create_node(NODE_BINARY);
 
         op->value =
             strdup(current_token.value);
@@ -150,14 +144,10 @@ static ASTNode* parse_statement();
 static ASTNode* parse_block() {
 
     ASTNode* block =
-        create_node(
-            NODE_BLOCK
-        );
+        create_node(NODE_BLOCK);
 
     block->children =
-        malloc(
-            sizeof(ASTNode*) * 100
-        );
+        malloc(sizeof(ASTNode*) * 100);
 
     eat(TOKEN_LBRACE);
 
@@ -181,9 +171,7 @@ static ASTNode* parse_block() {
 static ASTNode* parse_assignment() {
 
     ASTNode* node =
-        create_node(
-            NODE_ASSIGNMENT
-        );
+        create_node(NODE_ASSIGNMENT);
 
     node->name =
         strdup(current_token.value);
@@ -202,9 +190,7 @@ static ASTNode* parse_assignment() {
 static ASTNode* parse_stamp() {
 
     ASTNode* node =
-        create_node(
-            NODE_STAMP
-        );
+        create_node(NODE_STAMP);
 
     eat(TOKEN_STAMP);
 
@@ -216,9 +202,7 @@ static ASTNode* parse_stamp() {
     ) {
 
         ASTNode* str =
-            create_node(
-                NODE_STRING
-            );
+            create_node(NODE_STRING);
 
         str->value =
             strdup(current_token.value);
@@ -245,9 +229,7 @@ static ASTNode* parse_stamp() {
 static ASTNode* parse_if() {
 
     ASTNode* node =
-        create_node(
-            NODE_IF
-        );
+        create_node(NODE_IF);
 
     eat(TOKEN_IF);
 
@@ -264,9 +246,7 @@ static ASTNode* parse_if() {
 static ASTNode* parse_flow() {
 
     ASTNode* node =
-        create_node(
-            NODE_FLOW
-        );
+        create_node(NODE_FLOW);
 
     eat(TOKEN_FLOW);
 
@@ -283,9 +263,7 @@ static ASTNode* parse_flow() {
 static ASTNode* parse_function() {
 
     ASTNode* node =
-        create_node(
-            NODE_FUNCTION
-        );
+        create_node(NODE_FUNCTION);
 
     eat(TOKEN_CRAFT);
 
@@ -313,9 +291,7 @@ static ASTNode* parse_function() {
 static ASTNode* parse_call() {
 
     ASTNode* node =
-        create_node(
-            NODE_CALL
-        );
+        create_node(NODE_CALL);
 
     node->name =
         strdup(current_token.value);
@@ -324,24 +300,15 @@ static ASTNode* parse_call() {
 
     eat(TOKEN_LPAREN);
 
-    if (
-        current_token.type ==
-        TOKEN_STRING
-    ) {
+    ASTNode* arg =
+        create_node(NODE_STRING);
 
-        ASTNode* arg =
-            create_node(
-                NODE_STRING
-            );
+    arg->value =
+        strdup(current_token.value);
 
-        arg->value =
-            strdup(current_token.value);
+    node->left = arg;
 
-        node->left = arg;
-
-        eat(TOKEN_STRING);
-
-    }
+    eat(TOKEN_STRING);
 
     eat(TOKEN_RPAREN);
 
@@ -406,15 +373,27 @@ static ASTNode* parse_statement() {
             TOKEN_LPAREN
         ) {
 
-            current_token.type =
-                TOKEN_IDENTIFIER;
+            ASTNode* node =
+                create_node(NODE_CALL);
 
-            strcpy(
-                current_token.value,
-                saved
-            );
+            node->name =
+                strdup(saved);
 
-            return parse_call();
+            eat(TOKEN_LPAREN);
+
+            ASTNode* arg =
+                create_node(NODE_STRING);
+
+            arg->value =
+                strdup(current_token.value);
+
+            node->left = arg;
+
+            eat(TOKEN_STRING);
+
+            eat(TOKEN_RPAREN);
+
+            return node;
 
         }
 
