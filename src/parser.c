@@ -43,6 +43,39 @@ static void eat(TokenType type) {
 
 static ASTNode* parse_expression();
 
+static ASTNode* parse_array() {
+
+    ASTNode* node =
+        create_array_node();
+
+    eat(TOKEN_LBRACKET);
+
+    while (
+        current_token.type !=
+        TOKEN_RBRACKET
+    ) {
+
+        node->children[
+            node->child_count++
+        ] = parse_expression();
+
+        if (
+            current_token.type ==
+            TOKEN_COMMA
+        ) {
+
+            eat(TOKEN_COMMA);
+
+        }
+
+    }
+
+    eat(TOKEN_RBRACKET);
+
+    return node;
+
+}
+
 static ASTNode* parse_primary() {
 
     if (
@@ -85,6 +118,15 @@ static ASTNode* parse_primary() {
 
     if (
         current_token.type ==
+        TOKEN_LBRACKET
+    ) {
+
+        return parse_array();
+
+    }
+
+    if (
+        current_token.type ==
         TOKEN_INPUT
     ) {
 
@@ -107,6 +149,32 @@ static ASTNode* parse_primary() {
         current_token.type ==
         TOKEN_IDENTIFIER
     ) {
+
+        if (
+            next_token.type ==
+            TOKEN_LBRACKET
+        ) {
+
+            ASTNode* node =
+                create_node(
+                    NODE_INDEX
+                );
+
+            node->name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+            eat(TOKEN_LBRACKET);
+
+            node->left =
+                parse_expression();
+
+            eat(TOKEN_RBRACKET);
+
+            return node;
+
+        }
 
         if (
             next_token.type ==
