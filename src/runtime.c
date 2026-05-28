@@ -7,7 +7,8 @@
 typedef struct {
 
     char name[100];
-    char value[100];
+
+    char value[1000];
 
 } Variable;
 
