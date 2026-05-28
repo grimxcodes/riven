@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,14 +6,19 @@
 
 ASTNode* create_node(NodeType type) {
 
-    ASTNode* node = malloc(sizeof(ASTNode));
+    ASTNode* node =
+        malloc(sizeof(ASTNode));
 
     node->type = type;
 
     node->value = NULL;
+
     node->name = NULL;
 
+    node->param_name = NULL;
+
     node->left = NULL;
+
     node->right = NULL;
 
     node->children = NULL;
