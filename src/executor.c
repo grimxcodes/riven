@@ -118,23 +118,45 @@ static int eval(ASTNode* node) {
                     ) == 0
                 ) {
 
-                    int result =
-                        eval(node->left);
+                    if (node->left) {
 
-                    char buffer[100];
+                        if (
+                            node->left->type ==
+                            NODE_STRING
+                        ) {
 
-                    sprintf(
-                        buffer,
-                        "%d",
-                        result
-                    );
+                            runtime_set_variable(
 
-                    runtime_set_variable(
+                                functions[i].param,
 
-                        functions[i].param,
+                                node->left->value
+                            );
 
-                        buffer
-                    );
+                        }
+
+                        else {
+
+                            int result =
+                                eval(node->left);
+
+                            char buffer[100];
+
+                            sprintf(
+                                buffer,
+                                "%d",
+                                result
+                            );
+
+                            runtime_set_variable(
+
+                                functions[i].param,
+
+                                buffer
+                            );
+
+                        }
+
+                    }
 
                     return_flag = 0;
 
