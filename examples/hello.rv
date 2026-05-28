@@ -1,5 +1,7 @@
 riven core {
 
+    # functions
+
     craft add(a, b) {
 
         result = a + b
@@ -26,34 +28,64 @@ riven core {
 
     }
 
+    # input
+
+    stamp("Enter value")
+
+    user = input()
+
+    stamp(user)
+
+    if user > 5 {
+
+        stamp("big")
+
+    }
+
+    else {
+
+        stamp("small")
+
+    }
+
+    # nested functions
+
     value = complex(10)
 
     stamp(value)
 
     if value == 25 {
 
-        stamp("nested returns work")
+        stamp("nested works")
 
     }
 
-    i = 5
+    # loops
 
-    flow i > 0 {
+    i = 0
 
-        if i > 2 {
+    flow i < 5 {
 
-            stamp(i)
+        stamp(i)
 
-        }
-
-        else {
-
-            stamp("low")
-
-        }
-
-        i = i - 1
+        i = i + 1
 
     }
+
+    j = 5
+
+    flow j > 0 {
+
+        stamp(j)
+
+        j = j - 1
+
+    }
+
+    # multi params
+
+    total = add(100, 50)
+
+    stamp(total)
 
 }
