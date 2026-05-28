@@ -59,6 +59,22 @@ static int get_number_value() {
 
 }
 
+static void parse_statement();
+
+static void parse_block() {
+
+    eat(TOKEN_LBRACE);
+
+    while (current_token.type != TOKEN_RBRACE) {
+
+        parse_statement();
+
+    }
+
+    eat(TOKEN_RBRACE);
+
+}
+
 static void parse_stamp() {
 
     eat(TOKEN_STAMP);
@@ -121,23 +137,30 @@ static void parse_variable() {
 
         int left = get_number_value();
 
-        if (current_token.type == TOKEN_PLUS) {
+        while (
+            current_token.type == TOKEN_PLUS ||
+            current_token.type == TOKEN_MINUS
+        ) {
 
-            eat(TOKEN_PLUS);
+            if (current_token.type == TOKEN_PLUS) {
 
-            int right = get_number_value();
+                eat(TOKEN_PLUS);
 
-            left = left + right;
+                int right = get_number_value();
 
-        }
+                left = left + right;
 
-        else if (current_token.type == TOKEN_MINUS) {
+            }
 
-            eat(TOKEN_MINUS);
+            else if (current_token.type == TOKEN_MINUS) {
 
-            int right = get_number_value();
+                eat(TOKEN_MINUS);
 
-            left = left - right;
+                int right = get_number_value();
+
+                left = left - right;
+
+            }
 
         }
 
@@ -189,47 +212,134 @@ static int parse_condition() {
 
 }
 
+static void skip_block() {
+
+    int braces = 1;
+
+    while (braces > 0) {
+
+        current_token = get_next_token();
+
+        if (current_token.type == TOKEN_LBRACE)
+            braces++;
+
+        else if (current_token.type == TOKEN_RBRACE)
+            braces--;
+
+    }
+
+}
+
 static void parse_if() {
 
     eat(TOKEN_IF);
 
     int condition = parse_condition();
 
-    eat(TOKEN_LBRACE);
-
     if (condition) {
 
-        while (current_token.type != TOKEN_RBRACE) {
-
-            if (current_token.type == TOKEN_STAMP) {
-
-                parse_stamp();
-
-            }
-
-            else if (current_token.type == TOKEN_IDENTIFIER) {
-
-                parse_variable();
-
-            }
-
-        }
+        parse_block();
 
     }
 
     else {
 
-        int brace_count = 1;
+        eat(TOKEN_LBRACE);
 
-        while (brace_count > 0) {
+        skip_block();
 
-            current_token = get_next_token();
+    }
 
-            if (current_token.type == TOKEN_LBRACE)
-                brace_count++;
+    if (current_token.type == TOKEN_ELSE) {
 
-            if (current_token.type == TOKEN_RBRACE)
-                brace_count--;
+        eat(TOKEN_ELSE);
+
+        if (!condition) {
+
+            parse_block();
+
+        }
+
+        else {
+
+            eat(TOKEN_LBRACE);
+
+            skip_block();
+
+        }
+
+    }
+
+}
+
+static void parse_flow() {
+
+    eat(TOKEN_FLOW);
+
+    char* condition_var = strdup(current_token.value);
+
+    eat(TOKEN_IDENTIFIER);
+
+    TokenType condition_type = current_token.type;
+
+    if (condition_type == TOKEN_LESS) {
+
+        eat(TOKEN_LESS);
+
+    }
+
+    else if (condition_type == TOKEN_GREATER) {
+
+        eat(TOKEN_GREATER);
+
+    }
+
+    else if (condition_type == TOKEN_EQUAL_EQUAL) {
+
+        eat(TOKEN_EQUAL_EQUAL);
+
+    }
+
+    int compare_value = get_number_value();
+
+    eat(TOKEN_LBRACE);
+
+    long block_start = ftell(stdin);
+
+    Token saved_token = current_token;
+
+    while (1) {
+
+        int left = atoi(runtime_get_variable(condition_var));
+
+        int result = 0;
+
+        if (condition_type == TOKEN_LESS) {
+
+            result = left < compare_value;
+
+        }
+
+        else if (condition_type == TOKEN_GREATER) {
+
+            result = left > compare_value;
+
+        }
+
+        else if (condition_type == TOKEN_EQUAL_EQUAL) {
+
+            result = left == compare_value;
+
+        }
+
+        if (!result)
+            break;
+
+        current_token = saved_token;
+
+        while (current_token.type != TOKEN_RBRACE) {
+
+            parse_statement();
 
         }
 
@@ -237,43 +347,39 @@ static void parse_if() {
 
     eat(TOKEN_RBRACE);
 
-    if (current_token.type == TOKEN_ELSE) {
+}
 
-        eat(TOKEN_ELSE);
+static void parse_statement() {
 
-        eat(TOKEN_LBRACE);
+    if (current_token.type == TOKEN_STAMP) {
 
-        if (!condition) {
+        parse_stamp();
 
-            while (current_token.type != TOKEN_RBRACE) {
+    }
 
-                if (current_token.type == TOKEN_STAMP) {
+    else if (current_token.type == TOKEN_IDENTIFIER) {
 
-                    parse_stamp();
+        parse_variable();
 
-                }
+    }
 
-                else if (current_token.type == TOKEN_IDENTIFIER) {
+    else if (current_token.type == TOKEN_IF) {
 
-                    parse_variable();
+        parse_if();
 
-                }
+    }
 
-            }
+    else if (current_token.type == TOKEN_FLOW) {
 
-        }
+        parse_flow();
 
-        else {
+    }
 
-            while (current_token.type != TOKEN_RBRACE) {
+    else {
 
-                current_token = get_next_token();
+        printf("Unknown statement\n");
 
-            }
-
-        }
-
-        eat(TOKEN_RBRACE);
+        exit(1);
 
     }
 
@@ -287,38 +393,6 @@ void parse_program() {
 
     eat(TOKEN_CORE);
 
-    eat(TOKEN_LBRACE);
-
-    while (current_token.type != TOKEN_RBRACE) {
-
-        if (current_token.type == TOKEN_STAMP) {
-
-            parse_stamp();
-
-        }
-
-        else if (current_token.type == TOKEN_IDENTIFIER) {
-
-            parse_variable();
-
-        }
-
-        else if (current_token.type == TOKEN_IF) {
-
-            parse_if();
-
-        }
-
-        else {
-
-            printf("Unknown statement\n");
-
-            exit(1);
-
-        }
-
-    }
-
-    eat(TOKEN_RBRACE);
+    parse_block();
 
 }
