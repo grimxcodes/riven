@@ -106,6 +106,18 @@ static ASTNode* parse_primary() {
             node->left =
                 parse_expression();
 
+            if (
+                current_token.type ==
+                TOKEN_COMMA
+            ) {
+
+                eat(TOKEN_COMMA);
+
+                node->right =
+                    parse_expression();
+
+            }
+
             eat(TOKEN_RPAREN);
 
             return node;
@@ -273,6 +285,18 @@ static ASTNode* parse_if() {
     node->right =
         parse_block();
 
+    if (
+        current_token.type ==
+        TOKEN_ELSE
+    ) {
+
+        eat(TOKEN_ELSE);
+
+        node->third =
+            parse_block();
+
+    }
+
     return node;
 
 }
@@ -316,6 +340,20 @@ static ASTNode* parse_function() {
         strdup(current_token.value);
 
     eat(TOKEN_IDENTIFIER);
+
+    if (
+        current_token.type ==
+        TOKEN_COMMA
+    ) {
+
+        eat(TOKEN_COMMA);
+
+        node->param2_name =
+            strdup(current_token.value);
+
+        eat(TOKEN_IDENTIFIER);
+
+    }
 
     eat(TOKEN_RPAREN);
 
