@@ -3,88 +3,44 @@
 
 typedef enum {
 
-    TOKEN_EOF,
-
-    TOKEN_IDENTIFIER,
     TOKEN_NUMBER,
     TOKEN_STRING,
-
-    TOKEN_ASSIGN,
-
-    TOKEN_LBRACE,
-    TOKEN_RBRACE,
-
-    TOKEN_LPAREN,
-    TOKEN_RPAREN,
-
-    TOKEN_PLUS,
-    TOKEN_MINUS,
-    TOKEN_STAR,
-    TOKEN_SLASH,
-
-    TOKEN_INCREMENT,
-    TOKEN_DECREMENT,
-
-    TOKEN_EQUAL_EQUAL,
-    TOKEN_NOT_EQUAL,
-
-    TOKEN_GREATER,
-    TOKEN_LESS,
-
-    TOKEN_AND,
-    TOKEN_OR,
-    TOKEN_NOT,
-
-    TOKEN_IF,
-    TOKEN_ALTIF,
-    TOKEN_ELSE,
-
-    TOKEN_FLOW,
-    TOKEN_DURING,
-
-    TOKEN_CRAFT,
-    TOKEN_RETURNS,
-
-    TOKEN_FRAME,
-    TOKEN_BOOT,
+    TOKEN_IDENTIFIER,
 
     TOKEN_RIVEN,
     TOKEN_CORE,
 
     TOKEN_STAMP,
-    TOKEN_GRAB,
 
-    TOKEN_FIRM,
+    TOKEN_IF,
+    TOKEN_FLOW,
 
-    TOKEN_REC,
-    TOKEN_COLL,
+    TOKEN_CRAFT,
 
-    TOKEN_CORRECT,
-    TOKEN_INCORRECT,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
 
-    TOKEN_EMP,
+    TOKEN_ASSIGN,
+    TOKEN_EQUAL_EQUAL,
 
-    TOKEN_SPARK,
-    TOKEN_SYNC,
+    TOKEN_LESS,
+    TOKEN_GREATER,
 
-    TOKEN_ATTACK,
-    TOKEN_RESC,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
 
-    TOKEN_OPEN,
-    TOKEN_HIDDEN,
+    TOKEN_LBRACE,
+    TOKEN_RBRACE,
 
-    TOKEN_REF,
-    TOKEN_PTR,
-    TOKEN_RAW,
-
-    TOKEN_CONSISTOF
+    TOKEN_EOF
 
 } TokenType;
 
 typedef struct {
 
     TokenType type;
-    char* value;
+
+    char value[1000];
 
 } Token;
 
