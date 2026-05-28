@@ -57,13 +57,16 @@ static int eval(ASTNode* node) {
 
             return atoi(node->value);
 
-        case NODE_VARIABLE:
+        case NODE_VARIABLE: {
 
-            return atoi(
+            char* value =
                 runtime_get_variable(
                     node->name
-                )
-            );
+                );
+
+            return atoi(value);
+
+        }
 
         case NODE_BINARY:
 
@@ -103,21 +106,37 @@ void execute(ASTNode* node) {
 
         case NODE_ASSIGNMENT: {
 
-            int result =
-                eval(node->right);
+            if (
+                node->right->type ==
+                NODE_STRING
+            ) {
 
-            char buffer[100];
+                runtime_set_variable(
+                    node->name,
+                    node->right->value
+                );
 
-            sprintf(
-                buffer,
-                "%d",
-                result
-            );
+            }
 
-            runtime_set_variable(
-                node->name,
-                buffer
-            );
+            else {
+
+                int result =
+                    eval(node->right);
+
+                char buffer[100];
+
+                sprintf(
+                    buffer,
+                    "%d",
+                    result
+                );
+
+                runtime_set_variable(
+                    node->name,
+                    buffer
+                );
+
+            }
 
             break;
 
@@ -136,6 +155,21 @@ void execute(ASTNode* node) {
 
             }
 
+            else if (
+                node->left->type ==
+                NODE_VARIABLE
+            ) {
+
+                runtime_stamp(
+
+                    runtime_get_variable(
+                        node->left->name
+                    )
+
+                );
+
+            }
+
             else {
 
                 int result =
@@ -149,9 +183,7 @@ void execute(ASTNode* node) {
                     result
                 );
 
-                runtime_stamp(
-                    buffer
-                );
+                runtime_stamp(buffer);
 
             }
 
@@ -161,13 +193,12 @@ void execute(ASTNode* node) {
 
         case NODE_IF: {
 
-            if (
-                eval(node->left)
-            ) {
+            int condition =
+                eval(node->left);
 
-                execute(
-                    node->right
-                );
+            if (condition) {
+
+                execute(node->right);
 
             }
 
@@ -181,9 +212,7 @@ void execute(ASTNode* node) {
                 eval(node->left)
             ) {
 
-                execute(
-                    node->right
-                );
+                execute(node->right);
 
             }
 
@@ -234,18 +263,43 @@ void execute(ASTNode* node) {
                     ) == 0
                 ) {
 
-                    if (
-                        node->left &&
-                        node->left->type ==
-                        NODE_STRING
-                    ) {
+                    if (node->left) {
 
-                        runtime_set_variable(
+                        if (
+                            node->left->type ==
+                            NODE_STRING
+                        ) {
 
-                            functions[i].param,
+                            runtime_set_variable(
 
-                            node->left->value
-                        );
+                                functions[i].param,
+
+                                node->left->value
+                            );
+
+                        }
+
+                        else {
+
+                            int result =
+                                eval(node->left);
+
+                            char buffer[100];
+
+                            sprintf(
+                                buffer,
+                                "%d",
+                                result
+                            );
+
+                            runtime_set_variable(
+
+                                functions[i].param,
+
+                                buffer
+                            );
+
+                        }
 
                     }
 
