@@ -1,41 +1,43 @@
 riven core {
 
-    craft add(x) {
+    craft square(x) {
 
-        result = x + 10
+        result = x + x
 
         return result
 
     }
 
-    value = add(5)
+    craft calculate(n) {
+
+        temp = square(n)
+
+        final = temp + 5
+
+        return final
+
+    }
+
+    value = calculate(10)
 
     stamp(value)
 
-    i = 0
+    if value == 25 {
 
-    flow i < 5 {
+        stamp("nested calls work")
+
+    }
+
+    i = 3
+
+    flow i > 0 {
 
         stamp(i)
 
-        i = i + 1
+        i = i - 1
 
     }
 
-    if value == 15 {
-
-        stamp("return works")
-
-    }
-
-    if value > 10 {
-
-        stamp("math works")
-
-    }
-
-    final = add(20)
-
-    stamp(final)
+    stamp("v1 growing")
 
 }
