@@ -93,3 +93,21 @@ void runtime_stamp(
     printf("%s\n", text);
 
 }
+
+char* runtime_input() {
+
+    static char buffer[1000];
+
+    fgets(
+        buffer,
+        sizeof(buffer),
+        stdin
+    );
+
+    buffer[
+        strcspn(buffer, "\n")
+    ] = '\0';
+
+    return buffer;
+
+}
