@@ -253,3 +253,15 @@ Token get_next_token() {
     return make_token(TOKEN_EOF, "UNKNOWN");
 
 }
+
+Token peek_next_token() {
+
+    int saved_position = position;
+
+    Token token = get_next_token();
+
+    position = saved_position;
+
+    return token;
+
+}
