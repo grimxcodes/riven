@@ -5,37 +5,42 @@
 
 #include "lexer.h"
 
-static const char* src;
-static int pos = 0;
+static const char* source;
 
-void init_lexer(const char* source) {
+static int position = 0;
 
-    src = source;
-    pos = 0;
+void init_lexer(const char* text) {
 
-}
+    source = text;
 
-static char current() {
-
-    return src[pos];
+    position = 0;
 
 }
 
-static char peek() {
+static char current_char() {
 
-    return src[pos + 1];
+    return source[position];
 
 }
 
 static void advance() {
 
-    pos++;
+    if (current_char() != '\0') {
+
+        position++;
+
+    }
 
 }
 
 static void skip_whitespace() {
 
-    while (isspace(current())) {
+    while (
+        current_char() == ' ' ||
+        current_char() == '\n' ||
+        current_char() == '\t' ||
+        current_char() == '\r'
+    ) {
 
         advance();
 
@@ -43,26 +48,91 @@ static void skip_whitespace() {
 
 }
 
-static Token make_token(TokenType type, const char* value) {
+static Token make_token(
+    TokenType type,
+    const char* value
+) {
 
     Token token;
 
     token.type = type;
-    token.value = strdup(value);
+
+    strcpy(token.value, value);
 
     return token;
 
 }
 
-static Token identifier() {
+static Token string_token() {
 
-    char buffer[256];
+    advance();
+
+    char buffer[1000];
 
     int i = 0;
 
-    while (isalnum(current()) || current() == '_') {
+    while (
+        current_char() != '"' &&
+        current_char() != '\0'
+    ) {
 
-        buffer[i++] = current();
+        buffer[i++] =
+            current_char();
+
+        advance();
+
+    }
+
+    buffer[i] = '\0';
+
+    advance();
+
+    return make_token(
+        TOKEN_STRING,
+        buffer
+    );
+
+}
+
+static Token number_token() {
+
+    char buffer[100];
+
+    int i = 0;
+
+    while (
+        isdigit(current_char())
+    ) {
+
+        buffer[i++] =
+            current_char();
+
+        advance();
+
+    }
+
+    buffer[i] = '\0';
+
+    return make_token(
+        TOKEN_NUMBER,
+        buffer
+    );
+
+}
+
+static Token identifier_token() {
+
+    char buffer[100];
+
+    int i = 0;
+
+    while (
+        isalnum(current_char()) ||
+        current_char() == '_'
+    ) {
+
+        buffer[i++] =
+            current_char();
 
         advance();
 
@@ -82,60 +152,16 @@ static Token identifier() {
     if (strcmp(buffer, "if") == 0)
         return make_token(TOKEN_IF, buffer);
 
-    if (strcmp(buffer, "else") == 0)
-        return make_token(TOKEN_ELSE, buffer);
-
     if (strcmp(buffer, "flow") == 0)
         return make_token(TOKEN_FLOW, buffer);
 
     if (strcmp(buffer, "craft") == 0)
         return make_token(TOKEN_CRAFT, buffer);
 
-    return make_token(TOKEN_IDENTIFIER, buffer);
-
-}
-
-static Token string() {
-
-    char buffer[1024];
-
-    int i = 0;
-
-    advance();
-
-    while (current() != '"' && current() != '\0') {
-
-        buffer[i++] = current();
-
-        advance();
-
-    }
-
-    buffer[i] = '\0';
-
-    advance();
-
-    return make_token(TOKEN_STRING, buffer);
-
-}
-
-static Token number() {
-
-    char buffer[256];
-
-    int i = 0;
-
-    while (isdigit(current())) {
-
-        buffer[i++] = current();
-
-        advance();
-
-    }
-
-    buffer[i] = '\0';
-
-    return make_token(TOKEN_NUMBER, buffer);
+    return make_token(
+        TOKEN_IDENTIFIER,
+        buffer
+    );
 
 }
 
@@ -143,124 +169,167 @@ Token get_next_token() {
 
     skip_whitespace();
 
-    if (current() == '\0') {
+    char c = current_char();
 
-        return make_token(TOKEN_EOF, "EOF");
+    if (c == '\0') {
 
-    }
-
-    if (isalpha(current())) {
-
-        return identifier();
-
-    }
-
-    if (isdigit(current())) {
-
-        return number();
+        return make_token(
+            TOKEN_EOF,
+            "EOF"
+        );
 
     }
 
-    if (current() == '"') {
+    if (isdigit(c)) {
 
-        return string();
-
-    }
-
-    if (current() == '=' && peek() == '=') {
-
-        advance();
-        advance();
-
-        return make_token(TOKEN_EQUAL_EQUAL, "==");
+        return number_token();
 
     }
 
-    if (current() == '=') {
+    if (
+        isalpha(c) ||
+        c == '_'
+    ) {
 
-        advance();
-
-        return make_token(TOKEN_ASSIGN, "=");
+        return identifier_token();
 
     }
 
-    if (current() == '>') {
+    if (c == '"') {
+
+        return string_token();
+
+    }
+
+    if (c == '{') {
 
         advance();
 
-        return make_token(TOKEN_GREATER, ">");
+        return make_token(
+            TOKEN_LBRACE,
+            "{"
+        );
 
     }
 
-    if (current() == '<') {
+    if (c == '}') {
 
         advance();
 
-        return make_token(TOKEN_LESS, "<");
+        return make_token(
+            TOKEN_RBRACE,
+            "}"
+        );
 
     }
 
-    if (current() == '+') {
+    if (c == '(') {
 
         advance();
 
-        return make_token(TOKEN_PLUS, "+");
+        return make_token(
+            TOKEN_LPAREN,
+            "("
+        );
 
     }
 
-    if (current() == '-') {
+    if (c == ')') {
 
         advance();
 
-        return make_token(TOKEN_MINUS, "-");
+        return make_token(
+            TOKEN_RPAREN,
+            ")"
+        );
 
     }
 
-    if (current() == '{') {
+    if (c == '+') {
 
         advance();
 
-        return make_token(TOKEN_LBRACE, "{");
+        return make_token(
+            TOKEN_PLUS,
+            "+"
+        );
 
     }
 
-    if (current() == '}') {
+    if (c == '-') {
 
         advance();
 
-        return make_token(TOKEN_RBRACE, "}");
+        return make_token(
+            TOKEN_MINUS,
+            "-"
+        );
 
     }
 
-    if (current() == '(') {
+    if (c == '<') {
 
         advance();
 
-        return make_token(TOKEN_LPAREN, "(");
+        return make_token(
+            TOKEN_LESS,
+            "<"
+        );
 
     }
 
-    if (current() == ')') {
+    if (c == '>') {
 
         advance();
 
-        return make_token(TOKEN_RPAREN, ")");
+        return make_token(
+            TOKEN_GREATER,
+            ">"
+        );
+
+    }
+
+    if (c == '=') {
+
+        advance();
+
+        if (
+            current_char() == '='
+        ) {
+
+            advance();
+
+            return make_token(
+                TOKEN_EQUAL_EQUAL,
+                "=="
+            );
+
+        }
+
+        return make_token(
+            TOKEN_ASSIGN,
+            "="
+        );
 
     }
 
     advance();
 
-    return make_token(TOKEN_EOF, "UNKNOWN");
+    return make_token(
+        TOKEN_EOF,
+        "EOF"
+    );
 
 }
 
 Token peek_next_token() {
 
-    int saved_position = position;
+    int saved = position;
 
-    Token token = get_next_token();
+    Token token =
+        get_next_token();
 
-    position = saved_position;
+    position = saved;
 
     return token;
 
