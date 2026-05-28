@@ -7,16 +7,19 @@ typedef enum {
     NODE_STRING,
     NODE_VARIABLE,
 
-    NODE_ASSIGNMENT,
-    NODE_STAMP,
-
     NODE_BINARY,
+
+    NODE_ASSIGNMENT,
+
+    NODE_STAMP,
 
     NODE_IF,
     NODE_FLOW,
 
     NODE_FUNCTION,
     NODE_CALL,
+
+    NODE_RETURN,
 
     NODE_BLOCK
 
@@ -33,6 +36,7 @@ typedef struct ASTNode {
     char* param_name;
 
     struct ASTNode* left;
+
     struct ASTNode* right;
 
     struct ASTNode** children;
@@ -41,8 +45,6 @@ typedef struct ASTNode {
 
 } ASTNode;
 
-ASTNode* create_node(
-    NodeType type
-);
+ASTNode* create_node(NodeType type);
 
 #endif
