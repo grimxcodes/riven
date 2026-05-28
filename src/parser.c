@@ -8,12 +8,20 @@
 #include "ast.h"
 
 static Token current_token;
+static Token next_token;
+
+static void advance_parser() {
+
+    current_token = next_token;
+    next_token = get_next_token();
+
+}
 
 static void eat(TokenType type) {
 
     if (current_token.type == type) {
 
-        current_token = get_next_token();
+        advance_parser();
 
     }
 
@@ -32,21 +40,41 @@ static void eat(TokenType type) {
 
 static ASTNode* parse_expression();
 
-static ASTNode* parse_number() {
+static ASTNode* parse_primary() {
 
-    ASTNode* node =
-        create_node(NODE_NUMBER);
+    if (
+        current_token.type ==
+        TOKEN_NUMBER
+    ) {
 
-    node->value =
-        strdup(current_token.value);
+        ASTNode* node =
+            create_node(NODE_NUMBER);
 
-    eat(TOKEN_NUMBER);
+        node->value =
+            strdup(current_token.value);
 
-    return node;
+        eat(TOKEN_NUMBER);
 
-}
+        return node;
 
-static ASTNode* parse_variable() {
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_STRING
+    ) {
+
+        ASTNode* node =
+            create_node(NODE_STRING);
+
+        node->value =
+            strdup(current_token.value);
+
+        eat(TOKEN_STRING);
+
+        return node;
+
+    }
 
     ASTNode* node =
         create_node(NODE_VARIABLE);
@@ -62,22 +90,8 @@ static ASTNode* parse_variable() {
 
 static ASTNode* parse_expression() {
 
-    ASTNode* left;
-
-    if (
-        current_token.type ==
-        TOKEN_NUMBER
-    ) {
-
-        left = parse_number();
-
-    }
-
-    else {
-
-        left = parse_variable();
-
-    }
+    ASTNode* left =
+        parse_primary();
 
     while (
 
@@ -109,27 +123,10 @@ static ASTNode* parse_expression() {
 
         eat(type);
 
-        ASTNode* right;
-
-        if (
-            current_token.type ==
-            TOKEN_NUMBER
-        ) {
-
-            right =
-                parse_number();
-
-        }
-
-        else {
-
-            right =
-                parse_variable();
-
-        }
-
         op->left = left;
-        op->right = right;
+
+        op->right =
+            parse_primary();
 
         left = op;
 
@@ -196,29 +193,8 @@ static ASTNode* parse_stamp() {
 
     eat(TOKEN_LPAREN);
 
-    if (
-        current_token.type ==
-        TOKEN_STRING
-    ) {
-
-        ASTNode* str =
-            create_node(NODE_STRING);
-
-        str->value =
-            strdup(current_token.value);
-
-        node->left = str;
-
-        eat(TOKEN_STRING);
-
-    }
-
-    else {
-
-        node->left =
-            parse_expression();
-
-    }
+    node->left =
+        parse_expression();
 
     eat(TOKEN_RPAREN);
 
@@ -300,15 +276,8 @@ static ASTNode* parse_call() {
 
     eat(TOKEN_LPAREN);
 
-    ASTNode* arg =
-        create_node(NODE_STRING);
-
-    arg->value =
-        strdup(current_token.value);
-
-    node->left = arg;
-
-    eat(TOKEN_STRING);
+    node->left =
+        parse_expression();
 
     eat(TOKEN_RPAREN);
 
@@ -359,51 +328,14 @@ static ASTNode* parse_statement() {
         TOKEN_IDENTIFIER
     ) {
 
-        char saved[100];
-
-        strcpy(
-            saved,
-            current_token.value
-        );
-
-        eat(TOKEN_IDENTIFIER);
-
         if (
-            current_token.type ==
+            next_token.type ==
             TOKEN_LPAREN
         ) {
 
-            ASTNode* node =
-                create_node(NODE_CALL);
-
-            node->name =
-                strdup(saved);
-
-            eat(TOKEN_LPAREN);
-
-            ASTNode* arg =
-                create_node(NODE_STRING);
-
-            arg->value =
-                strdup(current_token.value);
-
-            node->left = arg;
-
-            eat(TOKEN_STRING);
-
-            eat(TOKEN_RPAREN);
-
-            return node;
+            return parse_call();
 
         }
-
-        current_token.type =
-            TOKEN_IDENTIFIER;
-
-        strcpy(
-            current_token.value,
-            saved
-        );
 
         return parse_assignment();
 
@@ -418,6 +350,9 @@ static ASTNode* parse_statement() {
 ASTNode* parse_program() {
 
     current_token =
+        get_next_token();
+
+    next_token =
         get_next_token();
 
     eat(TOKEN_RIVEN);
