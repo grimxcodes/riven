@@ -23,6 +23,12 @@ typedef enum {
 
     NODE_RETURN,
 
+    NODE_ARRAY,
+    NODE_INDEX,
+
+    NODE_INPUT,
+    NODE_IMPORT,
+
     NODE_BLOCK
 
 } NodeType;
