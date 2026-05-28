@@ -7,6 +7,4 @@ void init_lexer(const char* source);
 
 Token get_next_token();
 
-Token peek_next_token();
-
 #endif
