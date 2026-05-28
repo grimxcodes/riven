@@ -1,11 +1,15 @@
 riven core {
 
-    name = "ansh"
-
     age = 16
 
-    stamp(name)
+    next = age + 1
+
+    final = next + 10
 
     stamp(age)
+
+    stamp(next)
+
+    stamp(final)
 
 }
