@@ -36,10 +36,12 @@ static void advance() {
 static void skip_whitespace() {
 
     while (
+
         current_char() == ' ' ||
         current_char() == '\n' ||
         current_char() == '\t' ||
         current_char() == '\r'
+
     ) {
 
         advance();
@@ -72,8 +74,10 @@ static Token string_token() {
     int i = 0;
 
     while (
+
         current_char() != '"' &&
         current_char() != '\0'
+
     ) {
 
         buffer[i++] =
@@ -127,8 +131,10 @@ static Token identifier_token() {
     int i = 0;
 
     while (
+
         isalnum(current_char()) ||
         current_char() == '_'
+
     ) {
 
         buffer[i++] =
@@ -187,8 +193,10 @@ Token get_next_token() {
     }
 
     if (
+
         isalpha(c) ||
         c == '_'
+
     ) {
 
         return identifier_token();
@@ -319,18 +327,5 @@ Token get_next_token() {
         TOKEN_EOF,
         "EOF"
     );
-
-}
-
-Token peek_next_token() {
-
-    int saved = position;
-
-    Token token =
-        get_next_token();
-
-    position = saved;
-
-    return token;
 
 }
