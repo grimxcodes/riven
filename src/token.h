@@ -11,6 +11,8 @@ typedef enum {
     TOKEN_CORE,
 
     TOKEN_STAMP,
+    TOKEN_INPUT,
+    TOKEN_IMPORT,
 
     TOKEN_IF,
     TOKEN_ELSE,
@@ -33,6 +35,9 @@ typedef enum {
 
     TOKEN_LBRACE,
     TOKEN_RBRACE,
+
+    TOKEN_LBRACKET,
+    TOKEN_RBRACKET,
 
     TOKEN_COMMA,
 
