@@ -13,6 +13,7 @@ static Token next_token;
 static void advance_parser() {
 
     current_token = next_token;
+
     next_token = get_next_token();
 
 }
@@ -48,7 +49,9 @@ static ASTNode* parse_primary() {
     ) {
 
         ASTNode* node =
-            create_node(NODE_NUMBER);
+            create_node(
+                NODE_NUMBER
+            );
 
         node->value =
             strdup(current_token.value);
@@ -65,7 +68,9 @@ static ASTNode* parse_primary() {
     ) {
 
         ASTNode* node =
-            create_node(NODE_STRING);
+            create_node(
+                NODE_STRING
+            );
 
         node->value =
             strdup(current_token.value);
@@ -77,7 +82,9 @@ static ASTNode* parse_primary() {
     }
 
     ASTNode* node =
-        create_node(NODE_VARIABLE);
+        create_node(
+            NODE_VARIABLE
+        );
 
     node->name =
         strdup(current_token.value);
@@ -113,7 +120,9 @@ static ASTNode* parse_expression() {
     ) {
 
         ASTNode* op =
-            create_node(NODE_BINARY);
+            create_node(
+                NODE_BINARY
+            );
 
         op->value =
             strdup(current_token.value);
@@ -141,10 +150,14 @@ static ASTNode* parse_statement();
 static ASTNode* parse_block() {
 
     ASTNode* block =
-        create_node(NODE_BLOCK);
+        create_node(
+            NODE_BLOCK
+        );
 
     block->children =
-        malloc(sizeof(ASTNode*) * 100);
+        malloc(
+            sizeof(ASTNode*) * 100
+        );
 
     eat(TOKEN_LBRACE);
 
@@ -168,7 +181,9 @@ static ASTNode* parse_block() {
 static ASTNode* parse_assignment() {
 
     ASTNode* node =
-        create_node(NODE_ASSIGNMENT);
+        create_node(
+            NODE_ASSIGNMENT
+        );
 
     node->name =
         strdup(current_token.value);
@@ -187,7 +202,9 @@ static ASTNode* parse_assignment() {
 static ASTNode* parse_stamp() {
 
     ASTNode* node =
-        create_node(NODE_STAMP);
+        create_node(
+            NODE_STAMP
+        );
 
     eat(TOKEN_STAMP);
 
@@ -205,7 +222,9 @@ static ASTNode* parse_stamp() {
 static ASTNode* parse_if() {
 
     ASTNode* node =
-        create_node(NODE_IF);
+        create_node(
+            NODE_IF
+        );
 
     eat(TOKEN_IF);
 
@@ -222,7 +241,9 @@ static ASTNode* parse_if() {
 static ASTNode* parse_flow() {
 
     ASTNode* node =
-        create_node(NODE_FLOW);
+        create_node(
+            NODE_FLOW
+        );
 
     eat(TOKEN_FLOW);
 
@@ -239,7 +260,9 @@ static ASTNode* parse_flow() {
 static ASTNode* parse_function() {
 
     ASTNode* node =
-        create_node(NODE_FUNCTION);
+        create_node(
+            NODE_FUNCTION
+        );
 
     eat(TOKEN_CRAFT);
 
@@ -267,7 +290,9 @@ static ASTNode* parse_function() {
 static ASTNode* parse_call() {
 
     ASTNode* node =
-        create_node(NODE_CALL);
+        create_node(
+            NODE_CALL
+        );
 
     node->name =
         strdup(current_token.value);
@@ -285,6 +310,22 @@ static ASTNode* parse_call() {
 
 }
 
+static ASTNode* parse_return() {
+
+    ASTNode* node =
+        create_node(
+            NODE_RETURN
+        );
+
+    eat(TOKEN_RETURN);
+
+    node->left =
+        parse_expression();
+
+    return node;
+
+}
+
 static ASTNode* parse_statement() {
 
     if (
@@ -293,6 +334,15 @@ static ASTNode* parse_statement() {
     ) {
 
         return parse_function();
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_RETURN
+    ) {
+
+        return parse_return();
 
     }
 
@@ -341,7 +391,9 @@ static ASTNode* parse_statement() {
 
     }
 
-    printf("Unknown statement\n");
+    printf(
+        "Unknown statement\n"
+    );
 
     exit(1);
 
