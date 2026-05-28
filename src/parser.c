@@ -11,13 +11,9 @@ static Token current_token;
 
 static void eat(TokenType type) {
 
-    if (
-        current_token.type ==
-        type
-    ) {
+    if (current_token.type == type) {
 
-        current_token =
-            get_next_token();
+        current_token = get_next_token();
 
     }
 
@@ -77,15 +73,13 @@ static ASTNode* parse_expression() {
         TOKEN_NUMBER
     ) {
 
-        left =
-            parse_number();
+        left = parse_number();
 
     }
 
     else {
 
-        left =
-            parse_variable();
+        left = parse_variable();
 
     }
 
@@ -114,9 +108,7 @@ static ASTNode* parse_expression() {
             );
 
         op->value =
-            strdup(
-                current_token.value
-            );
+            strdup(current_token.value);
 
         TokenType type =
             current_token.type;
@@ -400,25 +392,45 @@ static ASTNode* parse_statement() {
         TOKEN_IDENTIFIER
     ) {
 
-        Token next =
-            peek_next_token();
+        char saved[100];
+
+        strcpy(
+            saved,
+            current_token.value
+        );
+
+        eat(TOKEN_IDENTIFIER);
 
         if (
-            next.type ==
+            current_token.type ==
             TOKEN_LPAREN
         ) {
+
+            current_token.type =
+                TOKEN_IDENTIFIER;
+
+            strcpy(
+                current_token.value,
+                saved
+            );
 
             return parse_call();
 
         }
 
+        current_token.type =
+            TOKEN_IDENTIFIER;
+
+        strcpy(
+            current_token.value,
+            saved
+        );
+
         return parse_assignment();
 
     }
 
-    printf(
-        "Unknown statement\n"
-    );
+    printf("Unknown statement\n");
 
     exit(1);
 
