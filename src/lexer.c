@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "lexer.h"
+#include "token.h"
 
 static const char* source;
 
@@ -25,7 +26,9 @@ static char current_char() {
 
 static void advance() {
 
-    if (current_char() != '\0') {
+    if (
+        current_char() != '\0'
+    ) {
 
         position++;
 
@@ -170,6 +173,12 @@ static Token identifier_token() {
     if (strcmp(buffer, "stamp") == 0)
         return make_token(TOKEN_STAMP, buffer);
 
+    if (strcmp(buffer, "input") == 0)
+        return make_token(TOKEN_INPUT, buffer);
+
+    if (strcmp(buffer, "import") == 0)
+        return make_token(TOKEN_IMPORT, buffer);
+
     if (strcmp(buffer, "if") == 0)
         return make_token(TOKEN_IF, buffer);
 
@@ -185,13 +194,6 @@ static Token identifier_token() {
     if (strcmp(buffer, "return") == 0)
         return make_token(TOKEN_RETURN, buffer);
 
-    if (strcmp(buffer, "input") == 0)
-    return make_token(TOKEN_INPUT, buffer);
-
-if (strcmp(buffer, "import") == 0)
-    return make_token(TOKEN_IMPORT, buffer);
-
-    
     return make_token(
         TOKEN_IDENTIFIER,
         buffer
@@ -205,7 +207,9 @@ Token get_next_token() {
 
         skip_whitespace();
 
-        if (current_char() == '#') {
+        if (
+            current_char() == '#'
+        ) {
 
             skip_comment();
 
@@ -291,6 +295,28 @@ Token get_next_token() {
         return make_token(
             TOKEN_RPAREN,
             ")"
+        );
+
+    }
+
+    if (c == '[') {
+
+        advance();
+
+        return make_token(
+            TOKEN_LBRACKET,
+            "["
+        );
+
+    }
+
+    if (c == ']') {
+
+        advance();
+
+        return make_token(
+            TOKEN_RBRACKET,
+            "]"
         );
 
     }
