@@ -19,28 +19,59 @@ static Function functions[100];
 
 static int function_count = 0;
 
+static int return_flag = 0;
+
+static int return_value = 0;
+
 static int eval(ASTNode* node);
 
 static int eval_binary(ASTNode* node) {
 
-    int left = eval(node->left);
+    int left =
+        eval(node->left);
 
-    int right = eval(node->right);
+    int right =
+        eval(node->right);
 
-    if (strcmp(node->value, "+") == 0)
+    if (
+        strcmp(node->value, "+") == 0
+    ) {
+
         return left + right;
 
-    if (strcmp(node->value, "-") == 0)
+    }
+
+    if (
+        strcmp(node->value, "-") == 0
+    ) {
+
         return left - right;
 
-    if (strcmp(node->value, "<") == 0)
+    }
+
+    if (
+        strcmp(node->value, "<") == 0
+    ) {
+
         return left < right;
 
-    if (strcmp(node->value, ">") == 0)
+    }
+
+    if (
+        strcmp(node->value, ">") == 0
+    ) {
+
         return left > right;
 
-    if (strcmp(node->value, "==") == 0)
+    }
+
+    if (
+        strcmp(node->value, "==") == 0
+    ) {
+
         return left == right;
+
+    }
 
     return 0;
 
@@ -72,6 +103,55 @@ static int eval(ASTNode* node) {
 
             return eval_binary(node);
 
+        case NODE_CALL: {
+
+            for (
+                int i = 0;
+                i < function_count;
+                i++
+            ) {
+
+                if (
+                    strcmp(
+                        functions[i].name,
+                        node->name
+                    ) == 0
+                ) {
+
+                    int result =
+                        eval(node->left);
+
+                    char buffer[100];
+
+                    sprintf(
+                        buffer,
+                        "%d",
+                        result
+                    );
+
+                    runtime_set_variable(
+
+                        functions[i].param,
+
+                        buffer
+                    );
+
+                    return_flag = 0;
+
+                    execute(
+                        functions[i].body
+                    );
+
+                    return return_value;
+
+                }
+
+            }
+
+            return 0;
+
+        }
+
         default:
             return 0;
 
@@ -93,6 +173,9 @@ void execute(ASTNode* node) {
                 i < node->child_count;
                 i++
             ) {
+
+                if (return_flag)
+                    return;
 
                 execute(
                     node->children[i]
@@ -183,7 +266,9 @@ void execute(ASTNode* node) {
                     result
                 );
 
-                runtime_stamp(buffer);
+                runtime_stamp(
+                    buffer
+                );
 
             }
 
@@ -198,7 +283,9 @@ void execute(ASTNode* node) {
 
             if (condition) {
 
-                execute(node->right);
+                execute(
+                    node->right
+                );
 
             }
 
@@ -212,7 +299,9 @@ void execute(ASTNode* node) {
                 eval(node->left)
             ) {
 
-                execute(node->right);
+                execute(
+                    node->right
+                );
 
             }
 
@@ -223,19 +312,23 @@ void execute(ASTNode* node) {
         case NODE_FUNCTION: {
 
             strcpy(
+
                 functions[
                     function_count
                 ].name,
 
                 node->name
+
             );
 
             strcpy(
+
                 functions[
                     function_count
                 ].param,
 
                 node->param_name
+
             );
 
             functions[
@@ -250,66 +343,18 @@ void execute(ASTNode* node) {
 
         case NODE_CALL: {
 
-            for (
-                int i = 0;
-                i < function_count;
-                i++
-            ) {
+            eval(node);
 
-                if (
-                    strcmp(
-                        functions[i].name,
-                        node->name
-                    ) == 0
-                ) {
+            break;
 
-                    if (node->left) {
+        }
 
-                        if (
-                            node->left->type ==
-                            NODE_STRING
-                        ) {
+        case NODE_RETURN: {
 
-                            runtime_set_variable(
+            return_value =
+                eval(node->left);
 
-                                functions[i].param,
-
-                                node->left->value
-                            );
-
-                        }
-
-                        else {
-
-                            int result =
-                                eval(node->left);
-
-                            char buffer[100];
-
-                            sprintf(
-                                buffer,
-                                "%d",
-                                result
-                            );
-
-                            runtime_set_variable(
-
-                                functions[i].param,
-
-                                buffer
-                            );
-
-                        }
-
-                    }
-
-                    execute(
-                        functions[i].body
-                    );
-
-                }
-
-            }
+            return_flag = 1;
 
             break;
 
