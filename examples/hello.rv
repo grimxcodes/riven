@@ -28,4 +28,14 @@ riven core {
 
     }
 
+    if value > 10 {
+
+        stamp("math works")
+
+    }
+
+    final = add(20)
+
+    stamp(final)
+
 }
