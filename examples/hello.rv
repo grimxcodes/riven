@@ -1,5 +1,11 @@
 riven core {
 
-    stamp("Riven Working")
+    craft greet(name) {
+
+        stamp(name)
+
+    }
+
+    greet("Ansh")
 
 }
