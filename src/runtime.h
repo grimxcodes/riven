@@ -16,4 +16,15 @@ char* runtime_get_variable(
 
 char* runtime_input();
 
+void runtime_set_array(
+    const char* name,
+    int index,
+    const char* value
+);
+
+char* runtime_get_array(
+    const char* name,
+    int index
+);
+
 #endif
