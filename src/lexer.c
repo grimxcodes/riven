@@ -50,6 +50,21 @@ static void skip_whitespace() {
 
 }
 
+static void skip_comment() {
+
+    while (
+
+        current_char() != '\n' &&
+        current_char() != '\0'
+
+    ) {
+
+        advance();
+
+    }
+
+}
+
 static Token make_token(
     TokenType type,
     const char* value
@@ -179,7 +194,21 @@ static Token identifier_token() {
 
 Token get_next_token() {
 
-    skip_whitespace();
+    while (1) {
+
+        skip_whitespace();
+
+        if (current_char() == '#') {
+
+            skip_comment();
+
+            continue;
+
+        }
+
+        break;
+
+    }
 
     char c = current_char();
 
