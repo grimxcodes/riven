@@ -35,9 +35,31 @@ static void parse_variable() {
 
     eat(TOKEN_ASSIGN);
 
-    char* value = strdup(current_token.value);
+    char* value;
 
-    eat(TOKEN_STRING);
+    if (current_token.type == TOKEN_STRING) {
+
+        value = strdup(current_token.value);
+
+        eat(TOKEN_STRING);
+
+    }
+
+    else if (current_token.type == TOKEN_NUMBER) {
+
+        value = strdup(current_token.value);
+
+        eat(TOKEN_NUMBER);
+
+    }
+
+    else {
+
+        printf("Invalid variable value\n");
+
+        exit(1);
+
+    }
 
     runtime_set_variable(name, value);
 
@@ -66,6 +88,16 @@ static void parse_stamp() {
         eat(TOKEN_IDENTIFIER);
 
         runtime_stamp(runtime_get_variable(name));
+
+    }
+
+    else if (current_token.type == TOKEN_NUMBER) {
+
+        char* number = strdup(current_token.value);
+
+        eat(TOKEN_NUMBER);
+
+        runtime_stamp(number);
 
     }
 
