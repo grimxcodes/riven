@@ -2,22 +2,12 @@ riven core {
 
     i = 0
 
-    stamp(i)
+    flow i < 5 {
 
-    i = i + 1
+        stamp(i)
 
-    stamp(i)
+        i = i + 1
 
-    i = i + 1
-
-    stamp(i)
-
-    i = i + 1
-
-    stamp(i)
-
-    i = i + 1
-
-    stamp(i)
+    }
 
 }
