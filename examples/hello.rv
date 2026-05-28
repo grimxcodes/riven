@@ -1,5 +1,5 @@
 riven core {
-
-    stamp("Hello my name is ansh! ")
-
+  name = "ansh"
+  age = 16
+stamp(name)
 }
