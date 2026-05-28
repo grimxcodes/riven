@@ -14,6 +14,8 @@ typedef enum {
     NODE_STAMP,
 
     NODE_IF,
+    NODE_ELSE,
+
     NODE_FLOW,
 
     NODE_FUNCTION,
@@ -35,9 +37,13 @@ typedef struct ASTNode {
 
     char* param_name;
 
+    char* param2_name;
+
     struct ASTNode* left;
 
     struct ASTNode* right;
+
+    struct ASTNode* third;
 
     struct ASTNode** children;
 
@@ -45,6 +51,8 @@ typedef struct ASTNode {
 
 } ASTNode;
 
-ASTNode* create_node(NodeType type);
+ASTNode* create_node(
+    NodeType type
+);
 
 #endif
