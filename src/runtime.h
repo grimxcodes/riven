@@ -1,9 +1,7 @@
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-void runtime_stamp(
-    const char* text
-);
+void runtime_stamp(const char* text);
 
 void runtime_set_variable(
     const char* name,
