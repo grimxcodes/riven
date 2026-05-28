@@ -8,9 +8,12 @@ typedef enum {
     TOKEN_IDENTIFIER,
     TOKEN_NUMBER,
     TOKEN_STRING,
+
     TOKEN_ASSIGN,
+
     TOKEN_LBRACE,
     TOKEN_RBRACE,
+
     TOKEN_LPAREN,
     TOKEN_RPAREN,
 
@@ -22,9 +25,9 @@ typedef enum {
     TOKEN_INCREMENT,
     TOKEN_DECREMENT,
 
-    TOKEN_EQUAL,
     TOKEN_EQUAL_EQUAL,
     TOKEN_NOT_EQUAL,
+
     TOKEN_GREATER,
     TOKEN_LESS,
 
@@ -74,10 +77,9 @@ typedef enum {
     TOKEN_PTR,
     TOKEN_RAW,
 
-    TOKEN_CONSISTOF,
+    TOKEN_CONSISTOF
 
 } TokenType;
-
 
 typedef struct {
 
