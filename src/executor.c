@@ -101,6 +101,21 @@ static int eval(ASTNode* node) {
 
         }
 
+        case NODE_INDEX: {
+
+            int index =
+                eval(node->left);
+
+            char* value =
+                runtime_get_array(
+                    node->name,
+                    index
+                );
+
+            return atoi(value);
+
+        }
+
         case NODE_INPUT: {
 
             char* text =
@@ -225,6 +240,58 @@ void execute(ASTNode* node) {
 
             if (
                 node->right->type ==
+                NODE_ARRAY
+            ) {
+
+                for (
+                    int i = 0;
+                    i < node->right->child_count;
+                    i++
+                ) {
+
+                    ASTNode* item =
+                        node->right->children[i];
+
+                    char buffer[100];
+
+                    if (
+                        item->type ==
+                        NODE_STRING
+                    ) {
+
+                        runtime_set_array(
+                            node->name,
+                            i,
+                            item->value
+                        );
+
+                    }
+
+                    else {
+
+                        int value =
+                            eval(item);
+
+                        sprintf(
+                            buffer,
+                            "%d",
+                            value
+                        );
+
+                        runtime_set_array(
+                            node->name,
+                            i,
+                            buffer
+                        );
+
+                    }
+
+                }
+
+            }
+
+            else if (
+                node->right->type ==
                 NODE_STRING
             ) {
 
@@ -281,6 +348,25 @@ void execute(ASTNode* node) {
 
                     runtime_get_variable(
                         node->left->name
+                    )
+
+                );
+
+            }
+
+            else if (
+                node->left->type ==
+                NODE_INDEX
+            ) {
+
+                int index =
+                    eval(node->left->left);
+
+                runtime_stamp(
+
+                    runtime_get_array(
+                        node->left->name,
+                        index
                     )
 
                 );
