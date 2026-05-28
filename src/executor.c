@@ -4,6 +4,8 @@
 
 #include "executor.h"
 #include "runtime.h"
+#include "lexer.h"
+#include "parser.h"
 
 typedef struct {
 
@@ -24,6 +26,49 @@ static int function_count = 0;
 static int return_value = 0;
 
 static int eval(ASTNode* node);
+
+static char* read_file(
+    const char* path
+) {
+
+    FILE* file =
+        fopen(path, "r");
+
+    if (!file) {
+
+        printf(
+            "Cannot open %s\n",
+            path
+        );
+
+        exit(1);
+
+    }
+
+    fseek(file, 0, SEEK_END);
+
+    long size =
+        ftell(file);
+
+    rewind(file);
+
+    char* buffer =
+        malloc(size + 1);
+
+    fread(
+        buffer,
+        1,
+        size,
+        file
+    );
+
+    buffer[size] = '\0';
+
+    fclose(file);
+
+    return buffer;
+
+}
 
 static int eval_binary(ASTNode* node) {
 
@@ -196,7 +241,12 @@ static int eval(ASTNode* node) {
 
             }
 
-            return 0;
+            printf(
+                "Unknown function %s\n",
+                node->name
+            );
+
+            exit(1);
 
         }
 
@@ -234,10 +284,17 @@ void execute(ASTNode* node) {
 
         case NODE_IMPORT: {
 
-            printf(
-                "[imported %s]\n",
-                node->value
-            );
+            char* code =
+                read_file(
+                    node->value
+                );
+
+            init_lexer(code);
+
+            ASTNode* program =
+                parse_program();
+
+            execute(program);
 
             break;
 
