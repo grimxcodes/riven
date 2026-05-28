@@ -81,17 +81,56 @@ static ASTNode* parse_primary() {
 
     }
 
-    ASTNode* node =
-        create_node(
-            NODE_VARIABLE
-        );
+    if (
+        current_token.type ==
+        TOKEN_IDENTIFIER
+    ) {
 
-    node->name =
-        strdup(current_token.value);
+        if (
+            next_token.type ==
+            TOKEN_LPAREN
+        ) {
 
-    eat(TOKEN_IDENTIFIER);
+            ASTNode* node =
+                create_node(
+                    NODE_CALL
+                );
 
-    return node;
+            node->name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+            eat(TOKEN_LPAREN);
+
+            node->left =
+                parse_expression();
+
+            eat(TOKEN_RPAREN);
+
+            return node;
+
+        }
+
+        ASTNode* node =
+            create_node(
+                NODE_VARIABLE
+            );
+
+        node->name =
+            strdup(current_token.value);
+
+        eat(TOKEN_IDENTIFIER);
+
+        return node;
+
+    }
+
+    printf(
+        "Invalid expression\n"
+    );
+
+    exit(1);
 
 }
 
@@ -287,29 +326,6 @@ static ASTNode* parse_function() {
 
 }
 
-static ASTNode* parse_call() {
-
-    ASTNode* node =
-        create_node(
-            NODE_CALL
-        );
-
-    node->name =
-        strdup(current_token.value);
-
-    eat(TOKEN_IDENTIFIER);
-
-    eat(TOKEN_LPAREN);
-
-    node->left =
-        parse_expression();
-
-    eat(TOKEN_RPAREN);
-
-    return node;
-
-}
-
 static ASTNode* parse_return() {
 
     ASTNode* node =
@@ -380,14 +396,14 @@ static ASTNode* parse_statement() {
 
         if (
             next_token.type ==
-            TOKEN_LPAREN
+            TOKEN_ASSIGN
         ) {
 
-            return parse_call();
+            return parse_assignment();
 
         }
 
-        return parse_assignment();
+        return parse_expression();
 
     }
 
