@@ -2,14 +2,16 @@ riven core {
 
     age = 16
 
-    next = age + 1
+    if age > 10 {
 
-    final = next + 10
+        stamp("big")
 
-    stamp(age)
+    }
 
-    stamp(next)
+    else {
 
-    stamp(final)
+        stamp("small")
+
+    }
 
 }
