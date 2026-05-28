@@ -8,7 +8,7 @@ typedef enum {
     TOKEN_IDENTIFIER,
     TOKEN_NUMBER,
     TOKEN_STRING,
-
+    TOKEN_ASSIGN,
     TOKEN_LBRACE,
     TOKEN_RBRACE,
     TOKEN_LPAREN,
