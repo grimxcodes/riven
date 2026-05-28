@@ -24,4 +24,16 @@ riven core {
 
     }
 
+    if i > 2 {
+
+        stamp("greater")
+
+    }
+
+    x = 10
+
+    y = x + 5
+
+    stamp(y)
+
 }
