@@ -9,7 +9,9 @@ typedef struct {
 
     char name[100];
 
-    char param[100];
+    char param1[100];
+
+    char param2[100];
 
     ASTNode* body;
 
@@ -120,22 +122,44 @@ static int eval(ASTNode* node) {
 
                     if (node->left) {
 
-                        int result =
+                        int value1 =
                             eval(node->left);
 
-                        char buffer[100];
+                        char buffer1[100];
 
                         sprintf(
-                            buffer,
+                            buffer1,
                             "%d",
-                            result
+                            value1
                         );
 
                         runtime_set_variable(
 
-                            functions[i].param,
+                            functions[i].param1,
 
-                            buffer
+                            buffer1
+                        );
+
+                    }
+
+                    if (node->right) {
+
+                        int value2 =
+                            eval(node->right);
+
+                        char buffer2[100];
+
+                        sprintf(
+                            buffer2,
+                            "%d",
+                            value2
+                        );
+
+                        runtime_set_variable(
+
+                            functions[i].param2,
+
+                            buffer2
                         );
 
                     }
@@ -190,21 +214,37 @@ void execute(ASTNode* node) {
 
         case NODE_ASSIGNMENT: {
 
-            int result =
-                eval(node->right);
+            if (
+                node->right->type ==
+                NODE_STRING
+            ) {
 
-            char buffer[100];
+                runtime_set_variable(
+                    node->name,
+                    node->right->value
+                );
 
-            sprintf(
-                buffer,
-                "%d",
-                result
-            );
+            }
 
-            runtime_set_variable(
-                node->name,
-                buffer
-            );
+            else {
+
+                int result =
+                    eval(node->right);
+
+                char buffer[100];
+
+                sprintf(
+                    buffer,
+                    "%d",
+                    result
+                );
+
+                runtime_set_variable(
+                    node->name,
+                    buffer
+                );
+
+            }
 
             break;
 
@@ -274,6 +314,16 @@ void execute(ASTNode* node) {
 
             }
 
+            else if (
+                node->third
+            ) {
+
+                execute(
+                    node->third
+                );
+
+            }
+
             break;
 
         }
@@ -310,11 +360,27 @@ void execute(ASTNode* node) {
 
                 functions[
                     function_count
-                ].param,
+                ].param1,
 
                 node->param_name
 
             );
+
+            if (
+                node->param2_name
+            ) {
+
+                strcpy(
+
+                    functions[
+                        function_count
+                    ].param2,
+
+                    node->param2_name
+
+                );
+
+            }
 
             functions[
                 function_count
