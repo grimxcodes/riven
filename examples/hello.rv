@@ -6,34 +6,50 @@ riven core {
 
     }
 
+    craft add(a) {
+
+        result = a + 10
+
+        stamp(result)
+
+    }
+
+    craft loopTest(limit) {
+
+        i = 0
+
+        flow i < limit {
+
+            stamp(i)
+
+            i = i + 1
+
+        }
+
+    }
+
     greet("Ansh")
 
-    i = 0
+    add(5)
 
-    flow i < 5 {
+    loopTest(3)
 
-        stamp(i)
+    x = 20
 
-        i = i + 1
-
-    }
-
-    if i == 5 {
-
-        stamp("done")
-
-    }
-
-    if i > 2 {
-
-        stamp("greater")
-
-    }
-
-    x = 10
-
-    y = x + 5
+    y = x + 30
 
     stamp(y)
+
+    if y == 50 {
+
+        stamp("correct")
+
+    }
+
+    if y > 10 {
+
+        stamp("big")
+
+    }
 
 }
