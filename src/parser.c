@@ -193,18 +193,25 @@ static ASTNode* parse_primary() {
 
             eat(TOKEN_LPAREN);
 
-            node->left =
-                parse_expression();
-
             if (
-                current_token.type ==
-                TOKEN_COMMA
+                current_token.type !=
+                TOKEN_RPAREN
             ) {
 
-                eat(TOKEN_COMMA);
-
-                node->right =
+                node->left =
                     parse_expression();
+
+                if (
+                    current_token.type ==
+                    TOKEN_COMMA
+                ) {
+
+                    eat(TOKEN_COMMA);
+
+                    node->right =
+                        parse_expression();
+
+                }
 
             }
 
@@ -297,7 +304,7 @@ static ASTNode* parse_block() {
 
     block->children =
         malloc(
-            sizeof(ASTNode*) * 100
+            sizeof(ASTNode*) * 1000
         );
 
     eat(TOKEN_LBRACE);
@@ -355,6 +362,24 @@ static ASTNode* parse_stamp() {
         parse_expression();
 
     eat(TOKEN_RPAREN);
+
+    return node;
+
+}
+
+static ASTNode* parse_import() {
+
+    ASTNode* node =
+        create_node(
+            NODE_IMPORT
+        );
+
+    eat(TOKEN_IMPORT);
+
+    node->value =
+        strdup(current_token.value);
+
+    eat(TOKEN_STRING);
 
     return node;
 
@@ -426,22 +451,29 @@ static ASTNode* parse_function() {
 
     eat(TOKEN_LPAREN);
 
-    node->param_name =
-        strdup(current_token.value);
-
-    eat(TOKEN_IDENTIFIER);
-
     if (
         current_token.type ==
-        TOKEN_COMMA
+        TOKEN_IDENTIFIER
     ) {
 
-        eat(TOKEN_COMMA);
-
-        node->param2_name =
+        node->param_name =
             strdup(current_token.value);
 
         eat(TOKEN_IDENTIFIER);
+
+        if (
+            current_token.type ==
+            TOKEN_COMMA
+        ) {
+
+            eat(TOKEN_COMMA);
+
+            node->param2_name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+        }
 
     }
 
@@ -471,6 +503,15 @@ static ASTNode* parse_return() {
 }
 
 static ASTNode* parse_statement() {
+
+    if (
+        current_token.type ==
+        TOKEN_IMPORT
+    ) {
+
+        return parse_import();
+
+    }
 
     if (
         current_token.type ==
