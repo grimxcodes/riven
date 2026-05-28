@@ -4,7 +4,9 @@
 
 #include "ast.h"
 
-ASTNode* create_node(NodeType type) {
+ASTNode* create_node(
+    NodeType type
+) {
 
     ASTNode* node =
         malloc(sizeof(ASTNode));
@@ -17,11 +19,33 @@ ASTNode* create_node(NodeType type) {
 
     node->param_name = NULL;
 
+    node->param2_name = NULL;
+
     node->left = NULL;
 
     node->right = NULL;
 
+    node->third = NULL;
+
+    node->child_count = 0;
+
     node->children = NULL;
+
+    return node;
+
+}
+
+ASTNode* create_array_node() {
+
+    ASTNode* node =
+        create_node(
+            NODE_ARRAY
+        );
+
+    node->children =
+        malloc(
+            sizeof(ASTNode*) * 100
+        );
 
     node->child_count = 0;
 
