@@ -158,11 +158,17 @@ static Token identifier_token() {
     if (strcmp(buffer, "if") == 0)
         return make_token(TOKEN_IF, buffer);
 
+    if (strcmp(buffer, "else") == 0)
+        return make_token(TOKEN_ELSE, buffer);
+
     if (strcmp(buffer, "flow") == 0)
         return make_token(TOKEN_FLOW, buffer);
 
     if (strcmp(buffer, "craft") == 0)
         return make_token(TOKEN_CRAFT, buffer);
+
+    if (strcmp(buffer, "return") == 0)
+        return make_token(TOKEN_RETURN, buffer);
 
     return make_token(
         TOKEN_IDENTIFIER,
@@ -249,6 +255,17 @@ Token get_next_token() {
         return make_token(
             TOKEN_RPAREN,
             ")"
+        );
+
+    }
+
+    if (c == ',') {
+
+        advance();
+
+        return make_token(
+            TOKEN_COMMA,
+            ","
         );
 
     }
