@@ -101,6 +101,15 @@ static int eval(ASTNode* node) {
 
         }
 
+        case NODE_INPUT: {
+
+            char* text =
+                runtime_input();
+
+            return atoi(text);
+
+        }
+
         case NODE_BINARY:
 
             return eval_binary(node);
@@ -363,7 +372,6 @@ void execute(ASTNode* node) {
                 ].param1,
 
                 node->param_name
-
             );
 
             if (
@@ -377,7 +385,6 @@ void execute(ASTNode* node) {
                     ].param2,
 
                     node->param2_name
-
                 );
 
             }
