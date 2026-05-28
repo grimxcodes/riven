@@ -1,13 +1,11 @@
 riven core {
 
-    i = 0
+    craft greet(name) {
 
-    flow i < 5 {
-
-        stamp(i)
-
-        i = i + 1
+        stamp(name)
 
     }
+
+    greet("Ansh")
 
 }
