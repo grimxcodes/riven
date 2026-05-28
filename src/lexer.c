@@ -21,6 +21,12 @@ static char current() {
 
 }
 
+static char peek() {
+
+    return src[pos + 1];
+
+}
+
 static void advance() {
 
     pos++;
@@ -75,6 +81,9 @@ static Token identifier() {
 
     if (strcmp(buffer, "if") == 0)
         return make_token(TOKEN_IF, buffer);
+
+    if (strcmp(buffer, "else") == 0)
+        return make_token(TOKEN_ELSE, buffer);
 
     if (strcmp(buffer, "flow") == 0)
         return make_token(TOKEN_FLOW, buffer);
@@ -158,11 +167,36 @@ Token get_next_token() {
 
     }
 
+    if (current() == '=' && peek() == '=') {
+
+        advance();
+        advance();
+
+        return make_token(TOKEN_EQUAL_EQUAL, "==");
+
+    }
+
     if (current() == '=') {
 
         advance();
 
         return make_token(TOKEN_ASSIGN, "=");
+
+    }
+
+    if (current() == '>') {
+
+        advance();
+
+        return make_token(TOKEN_GREATER, ">");
+
+    }
+
+    if (current() == '<') {
+
+        advance();
+
+        return make_token(TOKEN_LESS, "<");
 
     }
 
