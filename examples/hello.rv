@@ -18,4 +18,10 @@ riven core {
 
     }
 
+    if i == 5 {
+
+        stamp("done")
+
+    }
+
 }
