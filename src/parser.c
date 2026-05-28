@@ -10,6 +10,10 @@
 static Token current_token;
 static Token next_token;
 
+static ASTNode* imports[100];
+
+static int import_count = 0;
+
 static void advance_parser() {
 
     current_token = next_token;
@@ -42,6 +46,24 @@ static void eat(TokenType type) {
 }
 
 static ASTNode* parse_expression();
+
+static ASTNode* parse_import() {
+
+    ASTNode* node =
+        create_node(
+            NODE_IMPORT
+        );
+
+    eat(TOKEN_IMPORT);
+
+    node->value =
+        strdup(current_token.value);
+
+    eat(TOKEN_STRING);
+
+    return node;
+
+}
 
 static ASTNode* parse_array() {
 
@@ -367,24 +389,6 @@ static ASTNode* parse_stamp() {
 
 }
 
-static ASTNode* parse_import() {
-
-    ASTNode* node =
-        create_node(
-            NODE_IMPORT
-        );
-
-    eat(TOKEN_IMPORT);
-
-    node->value =
-        strdup(current_token.value);
-
-    eat(TOKEN_STRING);
-
-    return node;
-
-}
-
 static ASTNode* parse_if() {
 
     ASTNode* node =
@@ -506,15 +510,6 @@ static ASTNode* parse_statement() {
 
     if (
         current_token.type ==
-        TOKEN_IMPORT
-    ) {
-
-        return parse_import();
-
-    }
-
-    if (
-        current_token.type ==
         TOKEN_CRAFT
     ) {
 
@@ -592,10 +587,52 @@ ASTNode* parse_program() {
     next_token =
         get_next_token();
 
+    while (
+        current_token.type ==
+        TOKEN_IMPORT
+    ) {
+
+        imports[
+            import_count++
+        ] = parse_import();
+
+    }
+
     eat(TOKEN_RIVEN);
 
     eat(TOKEN_CORE);
 
-    return parse_block();
+    ASTNode* root =
+        parse_block();
+
+    for (
+        int i = import_count - 1;
+        i >= 0;
+        i--
+    ) {
+
+        ASTNode* wrapper =
+            create_node(
+                NODE_BLOCK
+            );
+
+        wrapper->children =
+            malloc(
+                sizeof(ASTNode*) * 1000
+            );
+
+        wrapper->children[
+            wrapper->child_count++
+        ] = imports[i];
+
+        wrapper->children[
+            wrapper->child_count++
+        ] = root;
+
+        root = wrapper;
+
+    }
+
+    return root;
 
 }
