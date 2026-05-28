@@ -39,6 +39,7 @@ char* runtime_get_variable(char* name) {
             return variables[i].value;
 
         }
+
     }
 
     return "";
