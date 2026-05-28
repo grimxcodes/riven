@@ -61,4 +61,6 @@ ASTNode* create_node(
     NodeType type
 );
 
+ASTNode* create_array_node();
+
 #endif
