@@ -1,54 +1,30 @@
 riven core {
 
-    craft greet(name) {
+    craft add(x) {
 
-        stamp(name)
+        result = x + 10
 
-    }
-
-    craft add(a) {
-
-        result = a + 10
-
-        stamp(result)
+        return result
 
     }
 
-    craft countdown(limit) {
+    value = add(5)
 
-        i = limit
+    stamp(value)
 
-        flow i > 0 {
+    i = 0
 
-            stamp(i)
+    flow i < 5 {
 
-            i = i - 1
+        stamp(i)
 
-        }
-
-    }
-
-    greet("Ansh")
-
-    add(5)
-
-    countdown(5)
-
-    x = 100
-
-    y = x - 50
-
-    stamp(y)
-
-    if y == 50 {
-
-        stamp("half")
+        i = i + 1
 
     }
 
-    if y < 100 {
+    if value == 15 {
 
-        stamp("smaller")
+        stamp("return works")
 
     }
 
