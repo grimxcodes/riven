@@ -1,5 +1,4 @@
 riven core {
   name = "ansh"
-  age = 16
-stamp(name)
+  stamp(name)
 }
