@@ -16,18 +16,25 @@ void init_lexer(const char* source) {
 }
 
 static char current() {
+
     return src[pos];
+
 }
 
 static void advance() {
+
     pos++;
+
 }
 
 static void skip_whitespace() {
 
     while (isspace(current())) {
+
         advance();
+
     }
+
 }
 
 static Token make_token(TokenType type, const char* value) {
@@ -38,17 +45,21 @@ static Token make_token(TokenType type, const char* value) {
     token.value = strdup(value);
 
     return token;
+
 }
 
 static Token identifier() {
 
     char buffer[256];
+
     int i = 0;
 
     while (isalnum(current()) || current() == '_') {
 
         buffer[i++] = current();
+
         advance();
+
     }
 
     buffer[i] = '\0';
@@ -72,11 +83,13 @@ static Token identifier() {
         return make_token(TOKEN_CRAFT, buffer);
 
     return make_token(TOKEN_IDENTIFIER, buffer);
+
 }
 
 static Token string() {
 
     char buffer[1024];
+
     int i = 0;
 
     advance();
@@ -84,7 +97,9 @@ static Token string() {
     while (current() != '"' && current() != '\0') {
 
         buffer[i++] = current();
+
         advance();
+
     }
 
     buffer[i] = '\0';
@@ -92,46 +107,73 @@ static Token string() {
     advance();
 
     return make_token(TOKEN_STRING, buffer);
+
 }
 
 Token get_next_token() {
 
     skip_whitespace();
 
-    if (current() == '\0')
+    if (current() == '\0') {
+
         return make_token(TOKEN_EOF, "EOF");
 
-    if (isalpha(current()))
+    }
+
+    if (isalpha(current())) {
+
         return identifier();
 
-    if (current() == '"')
+    }
+
+    if (current() == '"') {
+
         return string();
+
+    }
+
+    if (current() == '=') {
+
+        advance();
+
+        return make_token(TOKEN_ASSIGN, "=");
+
+    }
 
     if (current() == '{') {
 
         advance();
+
         return make_token(TOKEN_LBRACE, "{");
+
     }
 
     if (current() == '}') {
 
         advance();
+
         return make_token(TOKEN_RBRACE, "}");
+
     }
 
     if (current() == '(') {
 
         advance();
+
         return make_token(TOKEN_LPAREN, "(");
+
     }
 
     if (current() == ')') {
 
         advance();
+
         return make_token(TOKEN_RPAREN, ")");
+
     }
 
     advance();
 
     return make_token(TOKEN_EOF, "UNKNOWN");
+
 }
