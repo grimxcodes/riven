@@ -1,4 +1,11 @@
 riven core {
-  name = "ansh"
-  stamp(name)
+
+    name = "ansh"
+
+    age = 16
+
+    stamp(name)
+
+    stamp(age)
+
 }
