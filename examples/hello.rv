@@ -1,6 +1,6 @@
 riven core {
 
-    age = 16
+    age = 1
 
     if age > 10 {
 
