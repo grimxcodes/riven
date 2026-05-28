@@ -21,8 +21,6 @@ static Function functions[100];
 
 static int function_count = 0;
 
-static int return_flag = 0;
-
 static int return_value = 0;
 
 static int eval(ASTNode* node);
@@ -188,8 +186,6 @@ static int eval(ASTNode* node) {
 
                     }
 
-                    return_flag = 0;
-
                     execute(
                         functions[i].body
                     );
@@ -231,6 +227,17 @@ void execute(ASTNode* node) {
                 );
 
             }
+
+            break;
+
+        }
+
+        case NODE_IMPORT: {
+
+            printf(
+                "[imported %s]\n",
+                node->value
+            );
 
             break;
 
@@ -451,14 +458,21 @@ void execute(ASTNode* node) {
 
             );
 
-            strcpy(
-
-                functions[
-                    function_count
-                ].param1,
-
+            if (
                 node->param_name
-            );
+            ) {
+
+                strcpy(
+
+                    functions[
+                        function_count
+                    ].param1,
+
+                    node->param_name
+
+                );
+
+            }
 
             if (
                 node->param2_name
@@ -471,6 +485,7 @@ void execute(ASTNode* node) {
                     ].param2,
 
                     node->param2_name
+
                 );
 
             }
@@ -497,8 +512,6 @@ void execute(ASTNode* node) {
 
             return_value =
                 eval(node->left);
-
-            return_flag = 1;
 
             break;
 
