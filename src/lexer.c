@@ -185,6 +185,13 @@ static Token identifier_token() {
     if (strcmp(buffer, "return") == 0)
         return make_token(TOKEN_RETURN, buffer);
 
+    if (strcmp(buffer, "input") == 0)
+    return make_token(TOKEN_INPUT, buffer);
+
+if (strcmp(buffer, "import") == 0)
+    return make_token(TOKEN_IMPORT, buffer);
+
+    
     return make_token(
         TOKEN_IDENTIFIER,
         buffer
