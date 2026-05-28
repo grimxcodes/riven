@@ -3,10 +3,11 @@
 
 #include "lexer.h"
 #include "parser.h"
+#include "executor.h"
 
-char* read_file(const char* filename) {
+char* read_file(const char* path) {
 
-    FILE* file = fopen(filename, "rb");
+    FILE* file = fopen(path, "r");
 
     if (!file) {
 
@@ -22,7 +23,8 @@ char* read_file(const char* filename) {
 
     rewind(file);
 
-    char* buffer = malloc(size + 1);
+    char* buffer =
+        malloc(size + 1);
 
     fread(buffer, 1, size, file);
 
@@ -38,19 +40,23 @@ int main(int argc, char** argv) {
 
     if (argc < 2) {
 
-        printf("Usage: ./rvn <file.rv>\n");
+        printf(
+            "Usage: rvn file.rv\n"
+        );
 
         return 1;
 
     }
 
-    char* source = read_file(argv[1]);
+    char* source =
+        read_file(argv[1]);
 
     init_lexer(source);
 
-    parse_program();
+    ASTNode* root =
+        parse_program();
 
-    free(source);
+    execute(root);
 
     return 0;
 
