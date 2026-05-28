@@ -5,6 +5,20 @@
 #include "executor.h"
 #include "runtime.h"
 
+typedef struct {
+
+    char name[100];
+
+    char param[100];
+
+    ASTNode* body;
+
+} Function;
+
+static Function functions[100];
+
+static int function_count = 0;
+
 static int eval(ASTNode* node);
 
 static int eval_binary(ASTNode* node) {
@@ -43,16 +57,13 @@ static int eval(ASTNode* node) {
 
             return atoi(node->value);
 
-        case NODE_VARIABLE: {
+        case NODE_VARIABLE:
 
-            char* value =
+            return atoi(
                 runtime_get_variable(
                     node->name
-                );
-
-            return atoi(value);
-
-        }
+                )
+            );
 
         case NODE_BINARY:
 
@@ -97,7 +108,11 @@ void execute(ASTNode* node) {
 
             char buffer[100];
 
-            sprintf(buffer, "%d", result);
+            sprintf(
+                buffer,
+                "%d",
+                result
+            );
 
             runtime_set_variable(
                 node->name,
@@ -128,9 +143,15 @@ void execute(ASTNode* node) {
 
                 char buffer[100];
 
-                sprintf(buffer, "%d", result);
+                sprintf(
+                    buffer,
+                    "%d",
+                    result
+                );
 
-                runtime_stamp(buffer);
+                runtime_stamp(
+                    buffer
+                );
 
             }
 
@@ -140,12 +161,13 @@ void execute(ASTNode* node) {
 
         case NODE_IF: {
 
-            int condition =
-                eval(node->left);
+            if (
+                eval(node->left)
+            ) {
 
-            if (condition) {
-
-                execute(node->right);
+                execute(
+                    node->right
+                );
 
             }
 
@@ -159,7 +181,79 @@ void execute(ASTNode* node) {
                 eval(node->left)
             ) {
 
-                execute(node->right);
+                execute(
+                    node->right
+                );
+
+            }
+
+            break;
+
+        }
+
+        case NODE_FUNCTION: {
+
+            strcpy(
+                functions[
+                    function_count
+                ].name,
+
+                node->name
+            );
+
+            strcpy(
+                functions[
+                    function_count
+                ].param,
+
+                node->param_name
+            );
+
+            functions[
+                function_count
+            ].body = node->right;
+
+            function_count++;
+
+            break;
+
+        }
+
+        case NODE_CALL: {
+
+            for (
+                int i = 0;
+                i < function_count;
+                i++
+            ) {
+
+                if (
+                    strcmp(
+                        functions[i].name,
+                        node->name
+                    ) == 0
+                ) {
+
+                    if (
+                        node->left &&
+                        node->left->type ==
+                        NODE_STRING
+                    ) {
+
+                        runtime_set_variable(
+
+                            functions[i].param,
+
+                            node->left->value
+                        );
+
+                    }
+
+                    execute(
+                        functions[i].body
+                    );
+
+                }
 
             }
 
