@@ -110,6 +110,26 @@ static Token string() {
 
 }
 
+static Token number() {
+
+    char buffer[256];
+
+    int i = 0;
+
+    while (isdigit(current())) {
+
+        buffer[i++] = current();
+
+        advance();
+
+    }
+
+    buffer[i] = '\0';
+
+    return make_token(TOKEN_NUMBER, buffer);
+
+}
+
 Token get_next_token() {
 
     skip_whitespace();
@@ -123,6 +143,12 @@ Token get_next_token() {
     if (isalpha(current())) {
 
         return identifier();
+
+    }
+
+    if (isdigit(current())) {
+
+        return number();
 
     }
 
