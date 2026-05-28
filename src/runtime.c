@@ -12,9 +12,21 @@ typedef struct {
 
 } Variable;
 
+typedef struct {
+
+    char name[100];
+
+    char values[100][1000];
+
+} Array;
+
 static Variable variables[1000];
 
 static int variable_count = 0;
+
+static Array arrays[100];
+
+static int array_count = 0;
 
 void runtime_set_variable(
     const char* name,
@@ -109,5 +121,77 @@ char* runtime_input() {
     ] = '\0';
 
     return buffer;
+
+}
+
+void runtime_set_array(
+    const char* name,
+    int index,
+    const char* value
+) {
+
+    for (
+        int i = 0;
+        i < array_count;
+        i++
+    ) {
+
+        if (
+            strcmp(
+                arrays[i].name,
+                name
+            ) == 0
+        ) {
+
+            strcpy(
+                arrays[i].values[index],
+                value
+            );
+
+            return;
+
+        }
+
+    }
+
+    strcpy(
+        arrays[array_count].name,
+        name
+    );
+
+    strcpy(
+        arrays[array_count].values[index],
+        value
+    );
+
+    array_count++;
+
+}
+
+char* runtime_get_array(
+    const char* name,
+    int index
+) {
+
+    for (
+        int i = 0;
+        i < array_count;
+        i++
+    ) {
+
+        if (
+            strcmp(
+                arrays[i].name,
+                name
+            ) == 0
+        ) {
+
+            return arrays[i].values[index];
+
+        }
+
+    }
+
+    return "0";
 
 }
