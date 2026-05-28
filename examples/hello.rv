@@ -1,7 +1,5 @@
 riven core {
 
-    # multiple params
-
     craft add(a, b) {
 
         result = a + b
@@ -10,36 +8,38 @@ riven core {
 
     }
 
-    total = add(10, 20)
+    craft test(n) {
 
-    stamp(total)
+        if n > 5 {
 
-    # else support
+            stamp("big")
 
-    if total == 50 {
+        }
 
-        stamp("wrong")
+        else {
 
-    }
+            stamp("small")
 
-    else {
+        }
 
-        stamp("else works")
+        i = 0
 
-    }
+        flow i < n {
 
-    # comments support
+            stamp(i)
 
-    # this should not crash
+            i = i + 1
 
-    i = 0
-
-    flow i < 3 {
-
-        stamp(i)
-
-        i = i + 1
+        }
 
     }
+
+    value = add(7, 8)
+
+    stamp(value)
+
+    test(3)
+
+    test(8)
 
 }
