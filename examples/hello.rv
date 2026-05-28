@@ -1,24 +1,14 @@
 riven core {
 
-    stamp("ARRAY TEST")
+    import "std.rv"
 
-    numbers = [10, 20, 30, 40]
+    numbers = [5, 10, 15]
 
     stamp(numbers[0])
 
     stamp(numbers[1])
 
     stamp(numbers[2])
-
-    stamp(numbers[3])
-
-    names = ["Ansh", "Riven", "Fire"]
-
-    stamp(names[0])
-
-    stamp(names[1])
-
-    stamp(names[2])
 
     craft add(a, b) {
 
@@ -28,13 +18,19 @@ riven core {
 
     }
 
-    total = add(100, 50)
+    total = add(20, 30)
 
     stamp(total)
 
+    if total == 50 {
+
+        stamp("math works")
+
+    }
+
     i = 0
 
-    flow i < 4 {
+    flow i < 3 {
 
         stamp(numbers[i])
 
@@ -42,22 +38,10 @@ riven core {
 
     }
 
-    stamp("INPUT TEST")
+    stamp("enter value")
 
     value = input()
 
     stamp(value)
-
-    if value > 5 {
-
-        stamp("big")
-
-    }
-
-    else {
-
-        stamp("small")
-
-    }
 
 }
