@@ -176,7 +176,7 @@ static Token identifier_token() {
     if (strcmp(buffer, "input") == 0)
         return make_token(TOKEN_INPUT, buffer);
 
-    if (strcmp(buffer, "import") == 0)
+    if (strcmp(buffer, "consistof") == 0)
         return make_token(TOKEN_IMPORT, buffer);
 
     if (strcmp(buffer, "if") == 0)
