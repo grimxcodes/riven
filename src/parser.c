@@ -7,19 +7,35 @@
 #include "token.h"
 #include "runtime.h"
 
-static Token current_token;
+static Token tokens[5000];
+
+static int token_count = 0;
+
+static int current = 0;
+
+static Token current_token() {
+
+    return tokens[current];
+
+}
+
+static void advance() {
+
+    current++;
+
+}
 
 static void eat(TokenType type) {
 
-    if (current_token.type == type) {
+    if (current_token().type == type) {
 
-        current_token = get_next_token();
+        advance();
 
     }
 
     else {
 
-        printf("Unexpected token: %s\n", current_token.value);
+        printf("Unexpected token: %s\n", current_token().value);
 
         exit(1);
 
@@ -29,33 +45,29 @@ static void eat(TokenType type) {
 
 static int get_number_value() {
 
-    int value = 0;
+    if (current_token().type == TOKEN_NUMBER) {
 
-    if (current_token.type == TOKEN_NUMBER) {
-
-        value = atoi(current_token.value);
+        int value = atoi(current_token().value);
 
         eat(TOKEN_NUMBER);
 
+        return value;
+
     }
 
-    else if (current_token.type == TOKEN_IDENTIFIER) {
+    else if (current_token().type == TOKEN_IDENTIFIER) {
 
-        value = atoi(runtime_get_variable(current_token.value));
+        int value = atoi(runtime_get_variable(current_token().value));
 
         eat(TOKEN_IDENTIFIER);
 
-    }
-
-    else {
-
-        printf("Expected number\n");
-
-        exit(1);
+        return value;
 
     }
 
-    return value;
+    printf("Expected number\n");
+
+    exit(1);
 
 }
 
@@ -65,7 +77,7 @@ static void parse_block() {
 
     eat(TOKEN_LBRACE);
 
-    while (current_token.type != TOKEN_RBRACE) {
+    while (current_token().type != TOKEN_RBRACE) {
 
         parse_statement();
 
@@ -81,33 +93,29 @@ static void parse_stamp() {
 
     eat(TOKEN_LPAREN);
 
-    if (current_token.type == TOKEN_STRING) {
+    if (current_token().type == TOKEN_STRING) {
 
-        char* text = strdup(current_token.value);
+        runtime_stamp(current_token().value);
 
         eat(TOKEN_STRING);
 
-        runtime_stamp(text);
-
     }
 
-    else if (current_token.type == TOKEN_IDENTIFIER) {
+    else if (current_token().type == TOKEN_IDENTIFIER) {
 
-        char* name = strdup(current_token.value);
+        runtime_stamp(
+            runtime_get_variable(current_token().value)
+        );
 
         eat(TOKEN_IDENTIFIER);
 
-        runtime_stamp(runtime_get_variable(name));
-
     }
 
-    else if (current_token.type == TOKEN_NUMBER) {
+    else if (current_token().type == TOKEN_NUMBER) {
 
-        char* number = strdup(current_token.value);
+        runtime_stamp(current_token().value);
 
         eat(TOKEN_NUMBER);
-
-        runtime_stamp(number);
 
     }
 
@@ -117,19 +125,22 @@ static void parse_stamp() {
 
 static void parse_variable() {
 
-    char* name = strdup(current_token.value);
+    char name[100];
+
+    strcpy(name, current_token().value);
 
     eat(TOKEN_IDENTIFIER);
 
     eat(TOKEN_ASSIGN);
 
-    if (current_token.type == TOKEN_STRING) {
+    if (current_token().type == TOKEN_STRING) {
 
-        char* value = strdup(current_token.value);
+        runtime_set_variable(
+            name,
+            current_token().value
+        );
 
         eat(TOKEN_STRING);
-
-        runtime_set_variable(name, value);
 
     }
 
@@ -138,11 +149,11 @@ static void parse_variable() {
         int result = get_number_value();
 
         while (
-            current_token.type == TOKEN_PLUS ||
-            current_token.type == TOKEN_MINUS
+            current_token().type == TOKEN_PLUS ||
+            current_token().type == TOKEN_MINUS
         ) {
 
-            if (current_token.type == TOKEN_PLUS) {
+            if (current_token().type == TOKEN_PLUS) {
 
                 eat(TOKEN_PLUS);
 
@@ -150,7 +161,7 @@ static void parse_variable() {
 
             }
 
-            else if (current_token.type == TOKEN_MINUS) {
+            else {
 
                 eat(TOKEN_MINUS);
 
@@ -174,33 +185,27 @@ static int parse_condition() {
 
     int left = get_number_value();
 
-    if (current_token.type == TOKEN_GREATER) {
-
-        eat(TOKEN_GREATER);
-
-        int right = get_number_value();
-
-        return left > right;
-
-    }
-
-    else if (current_token.type == TOKEN_LESS) {
+    if (current_token().type == TOKEN_LESS) {
 
         eat(TOKEN_LESS);
 
-        int right = get_number_value();
-
-        return left < right;
+        return left < get_number_value();
 
     }
 
-    else if (current_token.type == TOKEN_EQUAL_EQUAL) {
+    else if (current_token().type == TOKEN_GREATER) {
+
+        eat(TOKEN_GREATER);
+
+        return left > get_number_value();
+
+    }
+
+    else if (current_token().type == TOKEN_EQUAL_EQUAL) {
 
         eat(TOKEN_EQUAL_EQUAL);
 
-        int right = get_number_value();
-
-        return left == right;
+        return left == get_number_value();
 
     }
 
@@ -214,13 +219,29 @@ static void parse_if() {
 
     int condition = parse_condition();
 
-    eat(TOKEN_LBRACE);
-
     if (condition) {
 
-        while (current_token.type != TOKEN_RBRACE) {
+        parse_block();
 
-            parse_statement();
+        if (current_token().type == TOKEN_ELSE) {
+
+            eat(TOKEN_ELSE);
+
+            eat(TOKEN_LBRACE);
+
+            int braces = 1;
+
+            while (braces > 0) {
+
+                if (current_token().type == TOKEN_LBRACE)
+                    braces++;
+
+                else if (current_token().type == TOKEN_RBRACE)
+                    braces--;
+
+                advance();
+
+            }
 
         }
 
@@ -228,61 +249,50 @@ static void parse_if() {
 
     else {
 
+        eat(TOKEN_LBRACE);
+
         int braces = 1;
 
         while (braces > 0) {
 
-            current_token = get_next_token();
-
-            if (current_token.type == TOKEN_LBRACE)
+            if (current_token().type == TOKEN_LBRACE)
                 braces++;
 
-            else if (current_token.type == TOKEN_RBRACE)
+            else if (current_token().type == TOKEN_RBRACE)
                 braces--;
 
+            advance();
+
+        }
+
+        if (current_token().type == TOKEN_ELSE) {
+
+            eat(TOKEN_ELSE);
+
+            parse_block();
+
         }
 
     }
 
-    eat(TOKEN_RBRACE);
+}
 
-    if (current_token.type == TOKEN_ELSE) {
+static void execute_saved_block(
+    int block_start,
+    int block_end
+) {
 
-        eat(TOKEN_ELSE);
+    int saved = current;
 
-        eat(TOKEN_LBRACE);
+    current = block_start;
 
-        if (!condition) {
+    while (current < block_end) {
 
-            while (current_token.type != TOKEN_RBRACE) {
-
-                parse_statement();
-
-            }
-
-        }
-
-        else {
-
-            int braces = 1;
-
-            while (braces > 0) {
-
-                current_token = get_next_token();
-
-                if (current_token.type == TOKEN_LBRACE)
-                    braces++;
-
-                else if (current_token.type == TOKEN_RBRACE)
-                    braces--;
-
-            }
-
-        }
-
-        eat(TOKEN_RBRACE);
+        parse_statement();
 
     }
+
+    current = saved;
 
 }
 
@@ -290,42 +300,43 @@ static void parse_flow() {
 
     eat(TOKEN_FLOW);
 
-    char* var_name = strdup(current_token.value);
+    char loop_var[100];
+
+    strcpy(loop_var, current_token().value);
 
     eat(TOKEN_IDENTIFIER);
 
-    TokenType op = current_token.type;
+    TokenType op = current_token().type;
 
-    if (op == TOKEN_LESS)
-        eat(TOKEN_LESS);
-
-    else if (op == TOKEN_GREATER)
-        eat(TOKEN_GREATER);
-
-    else if (op == TOKEN_EQUAL_EQUAL)
-        eat(TOKEN_EQUAL_EQUAL);
+    advance();
 
     int compare_value = get_number_value();
 
     eat(TOKEN_LBRACE);
 
-    Token loop_tokens[1000];
+    int block_start = current;
 
-    int loop_count = 0;
+    int braces = 1;
 
-    while (current_token.type != TOKEN_RBRACE) {
+    while (braces > 0) {
 
-        loop_tokens[loop_count++] = current_token;
+        if (current_token().type == TOKEN_LBRACE)
+            braces++;
 
-        current_token = get_next_token();
+        else if (current_token().type == TOKEN_RBRACE)
+            braces--;
+
+        advance();
 
     }
 
-    eat(TOKEN_RBRACE);
+    int block_end = current - 1;
 
     while (1) {
 
-        int left = atoi(runtime_get_variable(var_name));
+        int left = atoi(
+            runtime_get_variable(loop_var)
+        );
 
         int condition = 0;
 
@@ -341,34 +352,10 @@ static void parse_flow() {
         if (!condition)
             break;
 
-        int saved_index = 0;
-
-        Token backup = current_token;
-
-        current_token = loop_tokens[saved_index++];
-
-        while (saved_index <= loop_count) {
-
-            if (current_token.type == TOKEN_STAMP) {
-
-                parse_stamp();
-
-            }
-
-            else if (current_token.type == TOKEN_IDENTIFIER) {
-
-                parse_variable();
-
-            }
-
-            if (saved_index >= loop_count)
-                break;
-
-            current_token = loop_tokens[saved_index++];
-
-        }
-
-        current_token = backup;
+        execute_saved_block(
+            block_start,
+            block_end
+        );
 
     }
 
@@ -376,25 +363,25 @@ static void parse_flow() {
 
 static void parse_statement() {
 
-    if (current_token.type == TOKEN_STAMP) {
+    if (current_token().type == TOKEN_STAMP) {
 
         parse_stamp();
 
     }
 
-    else if (current_token.type == TOKEN_IDENTIFIER) {
+    else if (current_token().type == TOKEN_IDENTIFIER) {
 
         parse_variable();
 
     }
 
-    else if (current_token.type == TOKEN_IF) {
+    else if (current_token().type == TOKEN_IF) {
 
         parse_if();
 
     }
 
-    else if (current_token.type == TOKEN_FLOW) {
+    else if (current_token().type == TOKEN_FLOW) {
 
         parse_flow();
 
@@ -402,7 +389,10 @@ static void parse_statement() {
 
     else {
 
-        printf("Unknown statement\n");
+        printf(
+            "Unknown statement: %s\n",
+            current_token().value
+        );
 
         exit(1);
 
@@ -412,7 +402,19 @@ static void parse_statement() {
 
 void parse_program() {
 
-    current_token = get_next_token();
+    Token token;
+
+    do {
+
+        token = get_next_token();
+
+        tokens[token_count++] = token;
+
+    }
+
+    while (token.type != TOKEN_EOF);
+
+    current = 0;
 
     eat(TOKEN_RIVEN);
 
