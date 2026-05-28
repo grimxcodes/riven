@@ -1,10 +1,17 @@
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-void runtime_stamp(char* text);
+void runtime_stamp(
+    const char* text
+);
 
-void runtime_set_variable(char* name, char* value);
+void runtime_set_variable(
+    const char* name,
+    const char* value
+);
 
-char* runtime_get_variable(char* name);
+char* runtime_get_variable(
+    const char* name
+);
 
 #endif
