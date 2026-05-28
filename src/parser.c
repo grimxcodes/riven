@@ -20,7 +20,9 @@ static void advance_parser() {
 
 static void eat(TokenType type) {
 
-    if (current_token.type == type) {
+    if (
+        current_token.type == type
+    ) {
 
         advance_parser();
 
@@ -76,6 +78,26 @@ static ASTNode* parse_primary() {
             strdup(current_token.value);
 
         eat(TOKEN_STRING);
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_INPUT
+    ) {
+
+        ASTNode* node =
+            create_node(
+                NODE_INPUT
+            );
+
+        eat(TOKEN_INPUT);
+
+        eat(TOKEN_LPAREN);
+
+        eat(TOKEN_RPAREN);
 
         return node;
 
