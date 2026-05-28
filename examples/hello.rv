@@ -1,6 +1,24 @@
 riven core {
 
-    # functions
+    stamp("ARRAY TEST")
+
+    numbers = [10, 20, 30, 40]
+
+    stamp(numbers[0])
+
+    stamp(numbers[1])
+
+    stamp(numbers[2])
+
+    stamp(numbers[3])
+
+    names = ["Ansh", "Riven", "Fire"]
+
+    stamp(names[0])
+
+    stamp(names[1])
+
+    stamp(names[2])
 
     craft add(a, b) {
 
@@ -10,33 +28,27 @@ riven core {
 
     }
 
-    craft double(x) {
+    total = add(100, 50)
 
-        result = x + x
+    stamp(total)
 
-        return result
+    i = 0
 
-    }
+    flow i < 4 {
 
-    craft complex(n) {
+        stamp(numbers[i])
 
-        temp = double(n)
-
-        final = add(temp, 5)
-
-        return final
+        i = i + 1
 
     }
 
-    # input
+    stamp("INPUT TEST")
 
-    stamp("Enter value")
+    value = input()
 
-    user = input()
+    stamp(value)
 
-    stamp(user)
-
-    if user > 5 {
+    if value > 5 {
 
         stamp("big")
 
@@ -47,45 +59,5 @@ riven core {
         stamp("small")
 
     }
-
-    # nested functions
-
-    value = complex(10)
-
-    stamp(value)
-
-    if value == 25 {
-
-        stamp("nested works")
-
-    }
-
-    # loops
-
-    i = 0
-
-    flow i < 5 {
-
-        stamp(i)
-
-        i = i + 1
-
-    }
-
-    j = 5
-
-    flow j > 0 {
-
-        stamp(j)
-
-        j = j - 1
-
-    }
-
-    # multi params
-
-    total = add(100, 50)
-
-    stamp(total)
 
 }
