@@ -5,46 +5,63 @@
 #include "executor.h"
 #include "runtime.h"
 
-static int eval(ASTNode* node) {
+static int eval(ASTNode* node);
 
-    if (node->type == NODE_NUMBER) {
+static int eval_binary(ASTNode* node) {
 
-        return atoi(node->value);
+    int left = eval(node->left);
 
-    }
+    int right = eval(node->right);
 
-    if (node->type == NODE_VARIABLE) {
+    if (strcmp(node->value, "+") == 0)
+        return left + right;
 
-        return atoi(
-            runtime_get_variable(node->name)
-        );
+    if (strcmp(node->value, "-") == 0)
+        return left - right;
 
-    }
+    if (strcmp(node->value, "<") == 0)
+        return left < right;
 
-    if (node->type == NODE_BINARY) {
+    if (strcmp(node->value, ">") == 0)
+        return left > right;
 
-        int left = eval(node->left);
-
-        int right = eval(node->right);
-
-        if (strcmp(node->value, "+") == 0)
-            return left + right;
-
-        if (strcmp(node->value, "-") == 0)
-            return left - right;
-
-        if (strcmp(node->value, "<") == 0)
-            return left < right;
-
-        if (strcmp(node->value, ">") == 0)
-            return left > right;
-
-        if (strcmp(node->value, "==") == 0)
-            return left == right;
-
-    }
+    if (strcmp(node->value, "==") == 0)
+        return left == right;
 
     return 0;
+
+}
+
+static int eval(ASTNode* node) {
+
+    if (node == NULL)
+        return 0;
+
+    switch (node->type) {
+
+        case NODE_NUMBER:
+
+            return atoi(node->value);
+
+        case NODE_VARIABLE: {
+
+            char* value =
+                runtime_get_variable(
+                    node->name
+                );
+
+            return atoi(value);
+
+        }
+
+        case NODE_BINARY:
+
+            return eval_binary(node);
+
+        default:
+            return 0;
+
+    }
 
 }
 
@@ -55,9 +72,28 @@ void execute(ASTNode* node) {
 
     switch (node->type) {
 
+        case NODE_BLOCK: {
+
+            for (
+                int i = 0;
+                i < node->child_count;
+                i++
+            ) {
+
+                execute(
+                    node->children[i]
+                );
+
+            }
+
+            break;
+
+        }
+
         case NODE_ASSIGNMENT: {
 
-            int result = eval(node->right);
+            int result =
+                eval(node->right);
 
             char buffer[100];
 
@@ -87,31 +123,14 @@ void execute(ASTNode* node) {
 
             else {
 
-                int result = eval(node->left);
+                int result =
+                    eval(node->left);
 
                 char buffer[100];
 
                 sprintf(buffer, "%d", result);
 
                 runtime_stamp(buffer);
-
-            }
-
-            break;
-
-        }
-
-        case NODE_BLOCK: {
-
-            for (
-                int i = 0;
-                i < node->child_count;
-                i++
-            ) {
-
-                execute(
-                    node->children[i]
-                );
 
             }
 
