@@ -8,4 +8,14 @@ riven core {
 
     greet("Ansh")
 
+    i = 0
+
+    flow i < 5 {
+
+        stamp(i)
+
+        i = i + 1
+
+    }
+
 }
