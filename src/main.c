@@ -5,13 +5,18 @@
 #include "parser.h"
 #include "executor.h"
 
-char* read_file(const char* path) {
+static char* read_file(
+    const char* filename
+) {
 
-    FILE* file = fopen(path, "r");
+    FILE* file =
+        fopen(filename, "r");
 
     if (!file) {
 
-        printf("Cannot open file\n");
+        printf(
+            "Cannot open file\n"
+        );
 
         exit(1);
 
@@ -26,7 +31,12 @@ char* read_file(const char* path) {
     char* buffer =
         malloc(size + 1);
 
-    fread(buffer, 1, size, file);
+    fread(
+        buffer,
+        1,
+        size,
+        file
+    );
 
     buffer[size] = '\0';
 
@@ -36,12 +46,15 @@ char* read_file(const char* path) {
 
 }
 
-int main(int argc, char** argv) {
+int main(
+    int argc,
+    char** argv
+) {
 
     if (argc < 2) {
 
         printf(
-            "Usage: rvn file.rv\n"
+            "Usage: rvn <file>\n"
         );
 
         return 1;
@@ -53,10 +66,10 @@ int main(int argc, char** argv) {
 
     init_lexer(source);
 
-    ASTNode* root =
+    ASTNode* program =
         parse_program();
 
-    execute(root);
+    execute(program);
 
     return 0;
 
