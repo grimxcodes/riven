@@ -120,41 +120,23 @@ static int eval(ASTNode* node) {
 
                     if (node->left) {
 
-                        if (
-                            node->left->type ==
-                            NODE_STRING
-                        ) {
+                        int result =
+                            eval(node->left);
 
-                            runtime_set_variable(
+                        char buffer[100];
 
-                                functions[i].param,
+                        sprintf(
+                            buffer,
+                            "%d",
+                            result
+                        );
 
-                                node->left->value
-                            );
+                        runtime_set_variable(
 
-                        }
+                            functions[i].param,
 
-                        else {
-
-                            int result =
-                                eval(node->left);
-
-                            char buffer[100];
-
-                            sprintf(
-                                buffer,
-                                "%d",
-                                result
-                            );
-
-                            runtime_set_variable(
-
-                                functions[i].param,
-
-                                buffer
-                            );
-
-                        }
+                            buffer
+                        );
 
                     }
 
@@ -196,9 +178,6 @@ void execute(ASTNode* node) {
                 i++
             ) {
 
-                if (return_flag)
-                    return;
-
                 execute(
                     node->children[i]
                 );
@@ -211,37 +190,21 @@ void execute(ASTNode* node) {
 
         case NODE_ASSIGNMENT: {
 
-            if (
-                node->right->type ==
-                NODE_STRING
-            ) {
+            int result =
+                eval(node->right);
 
-                runtime_set_variable(
-                    node->name,
-                    node->right->value
-                );
+            char buffer[100];
 
-            }
+            sprintf(
+                buffer,
+                "%d",
+                result
+            );
 
-            else {
-
-                int result =
-                    eval(node->right);
-
-                char buffer[100];
-
-                sprintf(
-                    buffer,
-                    "%d",
-                    result
-                );
-
-                runtime_set_variable(
-                    node->name,
-                    buffer
-                );
-
-            }
+            runtime_set_variable(
+                node->name,
+                buffer
+            );
 
             break;
 
