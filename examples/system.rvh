@@ -1,0 +1,17 @@
+<<
+
+Riven Standard System Header
+
+Current Purpose:
+basic import validation
+
+Future:
+system utilities
+memory tools
+time
+process
+kernel helpers
+
+>>
+
+firm system_version = 1
