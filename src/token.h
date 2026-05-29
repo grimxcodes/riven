@@ -28,6 +28,8 @@ typedef enum {
     TOKEN_RISE,
     TOKEN_DROP,
 
+    TOKEN_FIRM,
+
     TOKEN_CORRECT,
     TOKEN_INCORRECT,
     TOKEN_EMP,
