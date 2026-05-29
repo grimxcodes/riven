@@ -1,0 +1,11 @@
+craft add(a,b){
+
+    returns a+b
+
+}
+
+craft sub(a,b){
+
+    returns a-b
+
+}
