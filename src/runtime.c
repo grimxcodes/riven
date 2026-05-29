@@ -94,35 +94,6 @@ void runtime_set_variable(
 
 }
 
-void runtime_set_constant(
-    const char* name
-) {
-
-    for (
-        int i = 0;
-        i < variable_count;
-        i++
-    ) {
-
-        if (
-
-            strcmp(
-                variables[i].name,
-                name
-            ) == 0
-
-        ) {
-
-            variables[i].constant = 1;
-
-            return;
-
-        }
-
-    }
-
-}
-
 char* runtime_get_variable(
     const char* name
 ) {
@@ -154,6 +125,35 @@ char* runtime_get_variable(
     );
 
     exit(1);
+
+}
+
+void runtime_set_constant(
+    const char* name
+) {
+
+    for (
+        int i = 0;
+        i < variable_count;
+        i++
+    ) {
+
+        if (
+
+            strcmp(
+                variables[i].name,
+                name
+            ) == 0
+
+        ) {
+
+            variables[i].constant = 1;
+
+            return;
+
+        }
+
+    }
 
 }
 
