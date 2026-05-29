@@ -7,56 +7,21 @@ typedef enum {
     TOKEN_STRING,
     TOKEN_IDENTIFIER,
 
-    TOKEN_RIVEN,
-    TOKEN_CORE,
-
-    TOKEN_STAMP,
-    TOKEN_GRAB,
-
-    TOKEN_CONSISTOF,
-
-    TOKEN_IF,
-    TOKEN_ALTIF,
-    TOKEN_ELSE,
-
-    TOKEN_FLOW,
-    TOKEN_DURING,
-
-    TOKEN_CRAFT,
-    TOKEN_RETURNS,
-
-    TOKEN_FRAME,
-    TOKEN_BOOT,
-
-    TOKEN_OPEN,
-    TOKEN_HIDDEN,
-
-    TOKEN_SPAWN,
-
-    TOKEN_REC,
-
-    TOKEN_RISE,
-    TOKEN_DROP,
-
-    TOKEN_FIRM,
-
-    TOKEN_CORRECT,
-    TOKEN_INCORRECT,
-    TOKEN_EMP,
-
     TOKEN_PLUS,
     TOKEN_MINUS,
-
-    TOKEN_INCREMENT,
-    TOKEN_DECREMENT,
+    TOKEN_MULTIPLY,
+    TOKEN_DIVIDE,
 
     TOKEN_ASSIGN,
-    TOKEN_EQUAL_EQUAL,
-
-    TOKEN_DOT,
 
     TOKEN_LESS,
     TOKEN_GREATER,
+
+    TOKEN_EQUAL_EQUAL,
+    TOKEN_NOT_EQUAL,
+
+    TOKEN_INCREMENT,
+    TOKEN_DECREMENT,
 
     TOKEN_AND,
     TOKEN_OR,
@@ -64,7 +29,6 @@ typedef enum {
 
     TOKEN_AND_SYMBOL,
     TOKEN_OR_SYMBOL,
-    TOKEN_NOT_SYMBOL,
 
     TOKEN_LPAREN,
     TOKEN_RPAREN,
@@ -76,6 +40,40 @@ typedef enum {
     TOKEN_RBRACKET,
 
     TOKEN_COMMA,
+    TOKEN_DOT,
+
+    TOKEN_IF,
+    TOKEN_ALTIF,
+    TOKEN_ELSE,
+
+    TOKEN_FLOW,
+    TOKEN_DURING,
+
+    TOKEN_CRAFT,
+    TOKEN_RETURNS,
+
+    TOKEN_RIVEN,
+    TOKEN_CORE,
+
+    TOKEN_STAMP,
+    TOKEN_GRAB,
+
+    TOKEN_CORRECT,
+    TOKEN_INCORRECT,
+    TOKEN_EMP,
+
+    TOKEN_FIRM,
+
+    TOKEN_RISE,
+    TOKEN_DROP,
+
+    TOKEN_FRAME,
+    TOKEN_BOOT,
+    TOKEN_OPEN,
+    TOKEN_HIDDEN,
+    TOKEN_SPAWN,
+
+    TOKEN_CONSISTOF,
 
     TOKEN_EOF
 
@@ -85,7 +83,7 @@ typedef struct {
 
     TokenType type;
 
-    char value[1000];
+    char value[256];
 
 } Token;
 
