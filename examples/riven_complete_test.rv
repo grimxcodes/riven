@@ -1,0 +1,241 @@
+<<
+
+Riven Complete Feature Test
+
+Tests:
+- consistof
+- comments
+- firm constants
+- variables
+- arrays
+- array indexing
+- arithmetic
+- if
+- altif
+- else
+- booleans
+- and/or/not
+- flow loop
+- during loop
+- functions
+- returns
+- increment/decrement
+- rise/drop
+- frame parsing
+- hidden/open parsing
+- boot parsing
+- spawn validation
+- object parsing
+- function calls
+- 2 parameter functions
+
+>>
+
+consistof "system.rvh"
+
+firm version = 1
+firm app = 999
+
+craft add(a,b){
+
+    returns a + b
+
+}
+
+craft sub(a,b){
+
+    returns a - b
+
+}
+
+craft double(a,b){
+
+    returns a + b + b
+
+}
+
+frame User {
+
+    hidden password = 1234
+
+    boot(){
+
+        stamp("boot parser ok")
+
+    }
+
+    open login(){
+
+        stamp("login parser ok")
+
+    }
+
+}
+
+riven core {
+
+    stamp("=== START ===")
+
+    stamp(version)
+
+    stamp(app)
+
+    <<
+
+    Variable Test
+
+    >>
+
+    score = 10
+
+    stamp(score)
+
+    ~~ increment test
+
+    score+>
+
+    stamp(score)
+
+    score-<
+
+    stamp(score)
+
+    rise score
+
+    stamp(score)
+
+    drop score
+
+    stamp(score)
+
+    <<
+
+    Arithmetic Test
+
+    >>
+
+    total = 5 + 5
+
+    stamp(total)
+
+    result = add(5,7)
+
+    stamp(result)
+
+    answer = sub(20,5)
+
+    stamp(answer)
+
+    power = double(2,5)
+
+    stamp(power)
+
+    <<
+
+    Boolean Test
+
+    >>
+
+    logic = correct
+
+    if logic and correct {
+
+        stamp("and works")
+
+    }
+
+    if logic or incorrect {
+
+        stamp("or works")
+
+    }
+
+    if not incorrect {
+
+        stamp("not works")
+
+    }
+
+    <<
+
+    Array Test
+
+    >>
+
+    nums = [10,20,30]
+
+    stamp(nums[0])
+    stamp(nums[1])
+    stamp(nums[2])
+
+    <<
+
+    If / Altif / Else Test
+
+    >>
+
+    level = 2
+
+    if level > 5 {
+
+        stamp("high")
+
+    }
+
+    altif level == 2 {
+
+        stamp("medium")
+
+    }
+
+    else {
+
+        stamp("low")
+
+    }
+
+    <<
+
+    Flow Loop Test
+
+    >>
+
+    counter = 0
+
+    flow 5 {
+
+        rise counter
+
+    }
+
+    stamp(counter)
+
+    <<
+
+    During Loop Test
+
+    >>
+
+    loop = 0
+
+    during loop < 3 {
+
+        rise loop
+
+        stamp(loop)
+
+    }
+
+    <<
+
+    Frame Test
+
+    >>
+
+    user = spawn User()
+
+    stamp("spawn success")
+
+    stamp("=== END ===")
+
+}
