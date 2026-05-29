@@ -5,6 +5,8 @@ typedef enum {
 
     NODE_NUMBER,
     NODE_STRING,
+    NODE_BOOLEAN,
+    NODE_NULL,
 
     NODE_VARIABLE,
     NODE_ASSIGNMENT,
