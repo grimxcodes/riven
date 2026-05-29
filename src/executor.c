@@ -17,9 +17,19 @@ typedef struct {
 
 } Function;
 
+typedef struct {
+
+    char name[100];
+
+} Frame;
+
 static Function functions[100];
 
 static int function_count = 0;
+
+static Frame frames[100];
+
+static int frame_count = 0;
 
 static int return_value = 0;
 
@@ -76,6 +86,7 @@ static int eval_binary(ASTNode* node) {
     if (
 
         strcmp(node->value, "and") == 0 ||
+
         strcmp(node->value, "&&") == 0
 
     ) {
@@ -87,6 +98,7 @@ static int eval_binary(ASTNode* node) {
     if (
 
         strcmp(node->value, "or") == 0 ||
+
         strcmp(node->value, "||") == 0
 
     ) {
@@ -156,6 +168,38 @@ static int eval(ASTNode* node) {
         case NODE_BINARY:
 
             return eval_binary(node);
+
+        case NODE_OBJECT: {
+
+            for (
+                int i = 0;
+                i < frame_count;
+                i++
+            ) {
+
+                if (
+
+                    strcmp(
+                        frames[i].name,
+                        node->name
+                    ) == 0
+
+                ) {
+
+                    return 1;
+
+                }
+
+            }
+
+            printf(
+                "Unknown frame %s\n",
+                node->name
+            );
+
+            exit(1);
+
+        }
 
         case NODE_CALL: {
 
@@ -264,6 +308,24 @@ void execute(ASTNode* node) {
                 );
 
             }
+
+            break;
+
+        }
+
+        case NODE_FRAME: {
+
+            strcpy(
+
+                frames[
+                    frame_count
+                ].name,
+
+                node->name
+
+            );
+
+            frame_count++;
 
             break;
 
