@@ -1,0 +1,205 @@
+<<
+
+Riven Ultimate Demo
+Tests:
+- constants
+- arrays
+- loops
+- if/altif/else
+- functions
+- returns
+- booleans
+- increment/decrement
+- rise/drop
+- during loop
+- frame parsing
+- spawn validation
+- comments
+- imports
+
+Mini Project:
+Simple Todo Counter + Score System
+
+>>
+
+consistof "system.rvh"
+
+firm app_version = 1
+
+craft add(a,b){
+
+    returns a + b
+
+}
+
+craft multiply(a,b){
+
+    returns a + b + b
+
+}
+
+frame User {
+
+    hidden password = 1234
+
+    boot(){
+
+        stamp("User Started")
+
+    }
+
+    open login(){
+
+        stamp("Access Granted")
+
+    }
+
+}
+
+riven core {
+
+    stamp("=== RIVEN DEMO ===")
+
+    stamp(app_version)
+
+    <<
+
+    Array test
+
+    >>
+
+    todos = [
+
+        10,
+        20,
+        30
+
+    ]
+
+    stamp(todos[0])
+
+    stamp(todos[1])
+
+    stamp(todos[2])
+
+    ~~ counter test
+
+    total = 0
+
+    total+>
+
+    rise total
+
+    stamp(total)
+
+    drop total
+
+    stamp(total)
+
+    if total > 5 {
+
+        stamp("greater")
+
+    }
+
+    altif total == 1 {
+
+        stamp("equal one")
+
+    }
+
+    else {
+
+        stamp("unknown")
+
+    }
+
+    count = 0
+
+    flow 5 {
+
+        rise count
+
+    }
+
+    stamp(count)
+
+    number = 0
+
+    during number < 3 {
+
+        rise number
+
+        stamp(number)
+
+    }
+
+    result = add(5,7)
+
+    stamp(result)
+
+    math = multiply(2,5)
+
+    stamp(math)
+
+    logic = correct
+
+    if logic and correct {
+
+        stamp("logic success")
+
+    }
+
+    player = spawn User()
+
+    stamp("frame registered")
+
+    stamp("=== TODO PROJECT ===")
+
+    completed = 0
+
+    task1 = correct
+    task2 = correct
+    task3 = incorrect
+
+    if task1 == correct {
+
+        rise completed
+
+    }
+
+    if task2 == correct {
+
+        rise completed
+
+    }
+
+    if task3 == correct {
+
+        rise completed
+
+    }
+
+    stamp(completed)
+
+    if completed == 3 {
+
+        stamp("all tasks complete")
+
+    }
+
+    altif completed == 2 {
+
+        stamp("almost done")
+
+    }
+
+    else {
+
+        stamp("keep working")
+
+    }
+
+    stamp("=== END ===")
+
+}
