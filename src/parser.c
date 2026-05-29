@@ -10,6 +10,9 @@
 static Token current_token;
 static Token next_token;
 
+static ASTNode* global_nodes[1000];
+static int global_count = 0;
+
 static void advance_parser() {
 
     current_token = next_token;
@@ -646,10 +649,52 @@ ASTNode* parse_program() {
 
     }
 
+    while (
+
+        current_token.type ==
+        TOKEN_CRAFT
+
+    ) {
+
+        global_nodes[
+            global_count++
+        ] = parse_statement();
+
+    }
+
     eat(TOKEN_RIVEN);
 
     eat(TOKEN_CORE);
 
-    return parse_block();
+    ASTNode* root =
+        parse_block();
+
+    for (
+        int i = 0;
+        i < global_count;
+        i++
+    ) {
+
+        ASTNode* item =
+            global_nodes[i];
+
+        for (
+            int j = root->child_count;
+            j > 0;
+            j--
+        ) {
+
+            root->children[j] =
+                root->children[j - 1];
+
+        }
+
+        root->children[0] = item;
+
+        root->child_count++;
+
+    }
+
+    return root;
 
 }
