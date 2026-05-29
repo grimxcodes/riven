@@ -1,48 +1,76 @@
-consistof "std.rv"
+consistof "std.rvh"
+
+~~
+
+Riven V1 Final Syntax Test
+
+<<
+
+multi line comment
+
+>>
+
+craft add(a,b){
+
+    returns a+b
+
+}
 
 riven core {
 
-    stamp("Riven V1")
+    stamp("Riven Started")
 
-    numbers = [5, 10, 15]
+    score = 0
 
-    stamp(numbers[0])
+    score = score + 1
 
-    stamp(numbers[1])
+    if score > 0 and score < 10 {
 
-    stamp(numbers[2])
-
-    craft add(a, b) {
-
-        result = a + b
-
-        return result
+        stamp("score valid")
 
     }
 
-    total = add(20, 30)
+    altif score == 10 {
 
-    stamp(total)
+        stamp("perfect")
 
-    if total == 50 {
+    }
 
-        stamp("math works")
+    else {
+
+        stamp("invalid")
+
+    }
+
+    nums = [10,20,30]
+
+    stamp(nums[0])
+
+    stamp(nums[1])
+
+    stamp(nums[2])
+
+    flow 3 {
+
+        stamp("flow running")
 
     }
 
     i = 0
 
-    flow i < 3 {
+    during i < 3 {
 
-        stamp(numbers[i])
+        stamp(i)
 
         i = i + 1
 
     }
 
-    stamp("enter value")
+    total = add(10,20)
 
-    value = input()
+    stamp(total)
+
+    value = grab()
 
     stamp(value)
 
