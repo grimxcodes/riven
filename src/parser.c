@@ -145,38 +145,6 @@ static ASTNode* parse_primary() {
 
     if (
         current_token.type ==
-        TOKEN_NOT
-    ) {
-
-        eat(TOKEN_NOT);
-
-        ASTNode* node =
-            create_node(
-                NODE_BINARY
-            );
-
-        node->value =
-            strdup("==");
-
-        node->left =
-            parse_primary();
-
-        ASTNode* zero =
-            create_node(
-                NODE_NUMBER
-            );
-
-        zero->value =
-            strdup("0");
-
-        node->right = zero;
-
-        return node;
-
-    }
-
-    if (
-        current_token.type ==
         TOKEN_GRAB
     ) {
 
@@ -851,19 +819,19 @@ static ASTNode* parse_statement() {
 
     if (
         current_token.type ==
-        TOKEN_FRAME
+        TOKEN_FIRM
     ) {
 
-        return parse_frame();
+        return parse_firm();
 
     }
 
     if (
         current_token.type ==
-        TOKEN_FIRM
+        TOKEN_FRAME
     ) {
 
-        return parse_firm();
+        return parse_frame();
 
     }
 
@@ -978,6 +946,9 @@ ASTNode* parse_program() {
     }
 
     while (
+
+        current_token.type ==
+        TOKEN_FIRM ||
 
         current_token.type ==
         TOKEN_CRAFT ||
