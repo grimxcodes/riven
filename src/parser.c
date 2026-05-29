@@ -491,6 +491,29 @@ static ASTNode* parse_assignment() {
 
 }
 
+static ASTNode* parse_firm() {
+
+    ASTNode* node =
+        create_node(
+            NODE_CONSTANT_ASSIGNMENT
+        );
+
+    eat(TOKEN_FIRM);
+
+    node->name =
+        strdup(current_token.value);
+
+    eat(TOKEN_IDENTIFIER);
+
+    eat(TOKEN_ASSIGN);
+
+    node->right =
+        parse_expression();
+
+    return node;
+
+}
+
 static ASTNode* parse_stamp() {
 
     ASTNode* node =
@@ -721,6 +744,15 @@ static ASTNode* parse_statement() {
     ) {
 
         return parse_stamp();
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_FIRM
+    ) {
+
+        return parse_firm();
 
     }
 
