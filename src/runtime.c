@@ -281,3 +281,50 @@ char* runtime_input() {
     return buffer;
 
 }
+void runtime_create_object(
+    char* variable,
+    char* frame
+) {
+
+    strcpy(
+        objects[object_count].variable,
+        variable
+    );
+
+    strcpy(
+        objects[object_count].frame,
+        frame
+    );
+
+    object_count++;
+
+}
+
+char* runtime_get_object(
+    char* variable
+) {
+
+    for (
+        int i = 0;
+        i < object_count;
+        i++
+    ) {
+
+        if (
+
+            strcmp(
+                objects[i].variable,
+                variable
+            ) == 0
+
+        ) {
+
+            return objects[i].frame;
+
+        }
+
+    }
+
+    return NULL;
+
+}
