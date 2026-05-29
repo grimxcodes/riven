@@ -1,31 +1,24 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "lexer.h"
 
-static char* source = NULL;
-
-static int position = 0;
+static char* source;
+static int index_pos = 0;
 
 void init_lexer(char* text) {
 
     source = text;
 
-    position = 0;
+    index_pos = 0;
 
 }
 
 static char current_char() {
 
-    return source[position];
-
-}
-
-static char peek_char() {
-
-    return source[position + 1];
+    return source[index_pos];
 
 }
 
@@ -35,7 +28,7 @@ static void advance() {
         current_char() != '\0'
     ) {
 
-        position++;
+        index_pos++;
 
     }
 
@@ -46,8 +39,11 @@ static void skip_spaces() {
     while (
 
         current_char() == ' ' ||
+
         current_char() == '\n' ||
+
         current_char() == '\t' ||
+
         current_char() == '\r'
 
     ) {
@@ -58,71 +54,11 @@ static void skip_spaces() {
 
 }
 
-static void skip_comment() {
-
-    if (
-
-        current_char() == '~' &&
-        peek_char() == '~'
-
-    ) {
-
-        while (
-
-            current_char() != '\n' &&
-            current_char() != '\0'
-
-        ) {
-
-            advance();
-
-        }
-
-    }
-
-    else if (
-
-        current_char() == '<' &&
-        peek_char() == '<'
-
-    ) {
-
-        advance();
-        advance();
-
-        while (
-
-            !(
-
-                current_char() == '>' &&
-                peek_char() == '>'
-
-            ) &&
-
-            current_char() != '\0'
-
-        ) {
-
-            advance();
-
-        }
-
-        if (
-            current_char() != '\0'
-        ) {
-
-            advance();
-            advance();
-
-        }
-
-    }
-
-}
-
 static Token make_token(
+
     TokenType type,
     const char* value
+
 ) {
 
     Token token;
@@ -138,9 +74,9 @@ static Token make_token(
 
 }
 
-static Token number_token() {
+static Token read_number() {
 
-    char buffer[1000];
+    char buffer[256];
 
     int i = 0;
 
@@ -164,42 +100,9 @@ static Token number_token() {
 
 }
 
-static Token string_token() {
+static Token read_identifier() {
 
-    char buffer[1000];
-
-    int i = 0;
-
-    advance();
-
-    while (
-
-        current_char() != '"' &&
-        current_char() != '\0'
-
-    ) {
-
-        buffer[i++] =
-            current_char();
-
-        advance();
-
-    }
-
-    buffer[i] = '\0';
-
-    advance();
-
-    return make_token(
-        TOKEN_STRING,
-        buffer
-    );
-
-}
-
-static Token identifier_token() {
-
-    char buffer[1000];
+    char buffer[256];
 
     int i = 0;
 
@@ -219,61 +122,6 @@ static Token identifier_token() {
     }
 
     buffer[i] = '\0';
-
-    if (
-        strcmp(buffer, "riven") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RIVEN,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "core") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CORE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "stamp") == 0
-    ) {
-
-        return make_token(
-            TOKEN_STAMP,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "grab") == 0
-    ) {
-
-        return make_token(
-            TOKEN_GRAB,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "consistof") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CONSISTOF,
-            buffer
-        );
-
-    }
 
     if (
         strcmp(buffer, "if") == 0
@@ -353,6 +201,116 @@ static Token identifier_token() {
     }
 
     if (
+        strcmp(buffer, "riven") == 0
+    ) {
+
+        return make_token(
+            TOKEN_RIVEN,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "core") == 0
+    ) {
+
+        return make_token(
+            TOKEN_CORE,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "stamp") == 0
+    ) {
+
+        return make_token(
+            TOKEN_STAMP,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "grab") == 0
+    ) {
+
+        return make_token(
+            TOKEN_GRAB,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "correct") == 0
+    ) {
+
+        return make_token(
+            TOKEN_CORRECT,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "incorrect") == 0
+    ) {
+
+        return make_token(
+            TOKEN_INCORRECT,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "emp") == 0
+    ) {
+
+        return make_token(
+            TOKEN_EMP,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "firm") == 0
+    ) {
+
+        return make_token(
+            TOKEN_FIRM,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "rise") == 0
+    ) {
+
+        return make_token(
+            TOKEN_RISE,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "drop") == 0
+    ) {
+
+        return make_token(
+            TOKEN_DROP,
+            buffer
+        );
+
+    }
+
+    if (
         strcmp(buffer, "frame") == 0
     ) {
 
@@ -408,77 +366,11 @@ static Token identifier_token() {
     }
 
     if (
-        strcmp(buffer, "rec") == 0
+        strcmp(buffer, "consistof") == 0
     ) {
 
         return make_token(
-            TOKEN_REC,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "rise") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RISE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "drop") == 0
-    ) {
-
-        return make_token(
-            TOKEN_DROP,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "firm") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FIRM,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "correct") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CORRECT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "incorrect") == 0
-    ) {
-
-        return make_token(
-            TOKEN_INCORRECT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "emp") == 0
-    ) {
-
-        return make_token(
-            TOKEN_EMP,
+            TOKEN_CONSISTOF,
             buffer
         );
 
@@ -517,8 +409,163 @@ static Token identifier_token() {
 
     }
 
+    if (
+        strcmp(buffer, "rec") == 0
+    ) {
+
+        return make_token(
+            TOKEN_REC,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "ptr") == 0
+    ) {
+
+        return make_token(
+            TOKEN_PTR,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "ref") == 0
+    ) {
+
+        return make_token(
+            TOKEN_REF,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "raw") == 0
+    ) {
+
+        return make_token(
+            TOKEN_RAW,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "fetch") == 0
+    ) {
+
+        return make_token(
+            TOKEN_FETCH,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "spark") == 0
+    ) {
+
+        return make_token(
+            TOKEN_SPARK,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "sync") == 0
+    ) {
+
+        return make_token(
+            TOKEN_SYNC,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "file") == 0
+    ) {
+
+        return make_token(
+            TOKEN_FILE,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "int") == 0
+    ) {
+
+        return make_token(
+            TOKEN_INT,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "txt") == 0
+    ) {
+
+        return make_token(
+            TOKEN_TXT,
+            buffer
+        );
+
+    }
+
+    if (
+        strcmp(buffer, "dnum") == 0
+    ) {
+
+        return make_token(
+            TOKEN_DNUM,
+            buffer
+        );
+
+    }
+
     return make_token(
         TOKEN_IDENTIFIER,
+        buffer
+    );
+
+}
+
+static Token read_string() {
+
+    char buffer[1024];
+
+    int i = 0;
+
+    advance();
+
+    while (
+
+        current_char() != '"' &&
+
+        current_char() != '\0'
+
+    ) {
+
+        buffer[i++] =
+            current_char();
+
+        advance();
+
+    }
+
+    buffer[i] = '\0';
+
+    advance();
+
+    return make_token(
+        TOKEN_STRING,
         buffer
     );
 
@@ -533,28 +580,20 @@ Token get_next_token() {
         skip_spaces();
 
         if (
-
-            (current_char() == '~' &&
-            peek_char() == '~')
-
-            ||
-
-            (current_char() == '<' &&
-            peek_char() == '<')
-
+            isdigit(current_char())
         ) {
 
-            skip_comment();
-
-            continue;
+            return read_number();
 
         }
 
         if (
-            isdigit(current_char())
+            isalpha(current_char()) ||
+
+            current_char() == '_'
         ) {
 
-            return number_token();
+            return read_identifier();
 
         }
 
@@ -562,214 +601,364 @@ Token get_next_token() {
             current_char() == '"'
         ) {
 
-            return string_token();
+            return read_string();
 
         }
 
         if (
-            isalpha(current_char()) ||
-            current_char() == '_'
+
+            current_char() == '~' &&
+
+            source[index_pos + 1] == '~'
+
         ) {
 
-            return identifier_token();
+            while (
+
+                current_char() != '\n' &&
+
+                current_char() != '\0'
+
+            ) {
+
+                advance();
+
+            }
+
+            continue;
 
         }
 
         if (
-            current_char() == '+' &&
-            peek_char() == '>'
+
+            current_char() == '<' &&
+
+            source[index_pos + 1] == '<'
+
         ) {
 
             advance();
+            advance();
+
+            while (
+
+                !(
+
+                    current_char() == '>' &&
+
+                    source[index_pos + 1] == '>'
+
+                ) &&
+
+                current_char() != '\0'
+
+            ) {
+
+                advance();
+
+            }
+
+            advance();
+            advance();
+
+            continue;
+
+        }
+
+        if (
+            current_char() == '+'
+        ) {
+
+            if (
+                source[index_pos + 1] == '>'
+            ) {
+
+                advance();
+                advance();
+
+                return make_token(
+                    TOKEN_INCREMENT,
+                    "+>"
+                );
+
+            }
+
             advance();
 
             return make_token(
-                TOKEN_INCREMENT,
-                "+>"
+                TOKEN_PLUS,
+                "+"
             );
 
         }
 
         if (
-            current_char() == '-' &&
-            peek_char() == '<'
+            current_char() == '-'
         ) {
 
-            advance();
+            if (
+                source[index_pos + 1] == '<'
+            ) {
+
+                advance();
+                advance();
+
+                return make_token(
+                    TOKEN_DECREMENT,
+                    "-<"
+                );
+
+            }
+
             advance();
 
             return make_token(
-                TOKEN_DECREMENT,
-                "-<"
+                TOKEN_MINUS,
+                "-"
             );
 
         }
 
         if (
-            current_char() == '&' &&
-            peek_char() == '&'
+            current_char() == '*'
         ) {
 
             advance();
-            advance();
 
             return make_token(
-                TOKEN_AND_SYMBOL,
-                "&&"
+                TOKEN_MULTIPLY,
+                "*"
             );
 
         }
 
         if (
-            current_char() == '|' &&
-            peek_char() == '|'
+            current_char() == '/'
         ) {
 
             advance();
-            advance();
 
             return make_token(
-                TOKEN_OR_SYMBOL,
-                "||"
+                TOKEN_DIVIDE,
+                "/"
             );
 
         }
 
         if (
-            current_char() == '=' &&
-            peek_char() == '='
+            current_char() == '='
         ) {
 
-            advance();
+            if (
+                source[index_pos + 1] == '='
+            ) {
+
+                advance();
+                advance();
+
+                return make_token(
+                    TOKEN_EQUAL_EQUAL,
+                    "=="
+                );
+
+            }
+
             advance();
 
             return make_token(
-                TOKEN_EQUAL_EQUAL,
-                "=="
+                TOKEN_ASSIGN,
+                "="
             );
 
         }
 
-        switch (
-            current_char()
+        if (
+            current_char() == '!'
         ) {
 
-            case '+':
+            if (
+                source[index_pos + 1] == '='
+            ) {
 
+                advance();
                 advance();
 
                 return make_token(
-                    TOKEN_PLUS,
-                    "+"
+                    TOKEN_NOT_EQUAL,
+                    "!="
                 );
 
-            case '-':
+            }
 
+        }
+
+        if (
+            current_char() == '<'
+        ) {
+
+            advance();
+
+            return make_token(
+                TOKEN_LESS,
+                "<"
+            );
+
+        }
+
+        if (
+            current_char() == '>'
+        ) {
+
+            advance();
+
+            return make_token(
+                TOKEN_GREATER,
+                ">"
+            );
+
+        }
+
+        if (
+            current_char() == '&'
+        ) {
+
+            if (
+                source[index_pos + 1] == '&'
+            ) {
+
+                advance();
                 advance();
 
                 return make_token(
-                    TOKEN_MINUS,
-                    "-"
+                    TOKEN_AND_SYMBOL,
+                    "&&"
                 );
 
-            case '=':
+            }
 
+        }
+
+        if (
+            current_char() == '|'
+        ) {
+
+            if (
+                source[index_pos + 1] == '|'
+            ) {
+
+                advance();
                 advance();
 
                 return make_token(
-                    TOKEN_ASSIGN,
-                    "="
+                    TOKEN_OR_SYMBOL,
+                    "||"
                 );
 
-            case '<':
+            }
 
-                advance();
+        }
 
-                return make_token(
-                    TOKEN_LESS,
-                    "<"
-                );
+        if (
+            current_char() == '('
+        ) {
 
-            case '>':
+            advance();
 
-                advance();
+            return make_token(
+                TOKEN_LPAREN,
+                "("
+            );
 
-                return make_token(
-                    TOKEN_GREATER,
-                    ">"
-                );
+        }
 
-            case '.':
+        if (
+            current_char() == ')'
+        ) {
 
-                advance();
+            advance();
 
-                return make_token(
-                    TOKEN_DOT,
-                    "."
-                );
+            return make_token(
+                TOKEN_RPAREN,
+                ")"
+            );
 
-            case '(':
+        }
 
-                advance();
+        if (
+            current_char() == '{'
+        ) {
 
-                return make_token(
-                    TOKEN_LPAREN,
-                    "("
-                );
+            advance();
 
-            case ')':
+            return make_token(
+                TOKEN_LBRACE,
+                "{"
+            );
 
-                advance();
+        }
 
-                return make_token(
-                    TOKEN_RPAREN,
-                    ")"
-                );
+        if (
+            current_char() == '}'
+        ) {
 
-            case '{':
+            advance();
 
-                advance();
+            return make_token(
+                TOKEN_RBRACE,
+                "}"
+            );
 
-                return make_token(
-                    TOKEN_LBRACE,
-                    "{"
-                );
+        }
 
-            case '}':
+        if (
+            current_char() == '['
+        ) {
 
-                advance();
+            advance();
 
-                return make_token(
-                    TOKEN_RBRACE,
-                    "}"
-                );
+            return make_token(
+                TOKEN_LBRACKET,
+                "["
+            );
 
-            case '[':
+        }
 
-                advance();
+        if (
+            current_char() == ']'
+        ) {
 
-                return make_token(
-                    TOKEN_LBRACKET,
-                    "["
-                );
+            advance();
 
-            case ']':
+            return make_token(
+                TOKEN_RBRACKET,
+                "]"
+            );
 
-                advance();
+        }
 
-                return make_token(
-                    TOKEN_RBRACKET,
-                    "]"
-                );
+        if (
+            current_char() == ','
+        ) {
 
-            case ',':
+            advance();
 
-                advance();
+            return make_token(
+                TOKEN_COMMA,
+                ","
+            );
 
-                return make_token(
-                    TOKEN_COMMA,
-                    ","
-                );
+        }
+
+        if (
+            current_char() == '.'
+        ) {
+
+            advance();
+
+            return make_token(
+                TOKEN_DOT,
+                "."
+            );
 
         }
 
