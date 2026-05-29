@@ -40,10 +40,12 @@ void runtime_set_variable(
     ) {
 
         if (
+
             strcmp(
                 variables[i].name,
                 name
             ) == 0
+
         ) {
 
             strcpy(
@@ -82,10 +84,12 @@ char* runtime_get_variable(
     ) {
 
         if (
+
             strcmp(
                 variables[i].name,
                 name
             ) == 0
+
         ) {
 
             return variables[i].value;
@@ -94,33 +98,12 @@ char* runtime_get_variable(
 
     }
 
-    return "0";
-
-}
-
-void runtime_stamp(
-    const char* text
-) {
-
-    printf("%s\n", text);
-
-}
-
-char* runtime_input() {
-
-    static char buffer[1000];
-
-    fgets(
-        buffer,
-        sizeof(buffer),
-        stdin
+    printf(
+        "Unknown variable %s\n",
+        name
     );
 
-    buffer[
-        strcspn(buffer, "\n")
-    ] = '\0';
-
-    return buffer;
+    exit(1);
 
 }
 
@@ -137,10 +120,12 @@ void runtime_set_array(
     ) {
 
         if (
+
             strcmp(
                 arrays[i].name,
                 name
             ) == 0
+
         ) {
 
             strcpy(
@@ -180,10 +165,12 @@ char* runtime_get_array(
     ) {
 
         if (
+
             strcmp(
                 arrays[i].name,
                 name
             ) == 0
+
         ) {
 
             return arrays[i].values[index];
@@ -192,6 +179,43 @@ char* runtime_get_array(
 
     }
 
-    return "0";
+    printf(
+        "Unknown array %s\n",
+        name
+    );
+
+    exit(1);
+
+}
+
+void runtime_stamp(
+    const char* text
+) {
+
+    printf(
+        "%s\n",
+        text
+    );
+
+}
+
+char* runtime_input() {
+
+    static char buffer[1000];
+
+    fgets(
+        buffer,
+        sizeof(buffer),
+        stdin
+    );
+
+    buffer[
+        strcspn(
+            buffer,
+            "\n"
+        )
+    ] = '\0';
+
+    return buffer;
 
 }
