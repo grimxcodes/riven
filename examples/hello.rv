@@ -2,7 +2,7 @@ consistof "std.rvh"
 
 ~~
 
-Riven V1 Final Syntax Test
+single line comment
 
 <<
 
@@ -10,7 +10,7 @@ multi line comment
 
 >>
 
-craft add(a,b){
+craft multiply(a,b){
 
     returns a+b
 
@@ -69,6 +69,10 @@ riven core {
     total = add(10,20)
 
     stamp(total)
+
+    result = multiply(5,5)
+
+    stamp(result)
 
     value = grab()
 
