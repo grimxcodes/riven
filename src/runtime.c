@@ -16,22 +16,109 @@ typedef struct {
 
     char name[100];
 
-    char values[100][1000];
+    int index;
 
-} Array;
+    char value[1000];
+
+} ArrayItem;
+
+typedef struct {
+
+    char name[100];
+
+} Constant;
 
 static Variable variables[1000];
 
 static int variable_count = 0;
 
-static Array arrays[100];
+static ArrayItem arrays[1000];
 
 static int array_count = 0;
+
+static Constant constants[1000];
+
+static int constant_count = 0;
+
+void runtime_set_constant(
+    const char* name
+) {
+
+    strcpy(
+        constants[
+            constant_count
+        ].name,
+        name
+    );
+
+    constant_count++;
+
+}
+
+int runtime_is_constant(
+    const char* name
+) {
+
+    for (
+        int i = 0;
+        i < constant_count;
+        i++
+    ) {
+
+        if (
+
+            strcmp(
+                constants[i].name,
+                name
+            ) == 0
+
+        ) {
+
+            return 1;
+
+        }
+
+    }
+
+    return 0;
+
+}
 
 void runtime_set_variable(
     const char* name,
     const char* value
 ) {
+
+    if (
+        runtime_is_constant(name)
+    ) {
+
+        for (
+            int i = 0;
+            i < variable_count;
+            i++
+        ) {
+
+            if (
+
+                strcmp(
+                    variables[i].name,
+                    name
+                ) == 0
+
+            ) {
+
+                printf(
+                    "Cannot modify firm variable\n"
+                );
+
+                exit(1);
+
+            }
+
+        }
+
+    }
 
     for (
         int i = 0;
@@ -60,12 +147,16 @@ void runtime_set_variable(
     }
 
     strcpy(
-        variables[variable_count].name,
+        variables[
+            variable_count
+        ].name,
         name
     );
 
     strcpy(
-        variables[variable_count].value,
+        variables[
+            variable_count
+        ].value,
         value
     );
 
@@ -98,12 +189,7 @@ char* runtime_get_variable(
 
     }
 
-    printf(
-        "Unknown variable %s\n",
-        name
-    );
-
-    exit(1);
+    return "0";
 
 }
 
@@ -124,12 +210,15 @@ void runtime_set_array(
             strcmp(
                 arrays[i].name,
                 name
-            ) == 0
+            ) == 0 &&
+
+            arrays[i].index ==
+            index
 
         ) {
 
             strcpy(
-                arrays[i].values[index],
+                arrays[i].value,
                 value
             );
 
@@ -144,8 +233,11 @@ void runtime_set_array(
         name
     );
 
+    arrays[array_count].index =
+        index;
+
     strcpy(
-        arrays[array_count].values[index],
+        arrays[array_count].value,
         value
     );
 
@@ -169,22 +261,20 @@ char* runtime_get_array(
             strcmp(
                 arrays[i].name,
                 name
-            ) == 0
+            ) == 0 &&
+
+            arrays[i].index ==
+            index
 
         ) {
 
-            return arrays[i].values[index];
+            return arrays[i].value;
 
         }
 
     }
 
-    printf(
-        "Unknown array %s\n",
-        name
-    );
-
-    exit(1);
+    return "0";
 
 }
 
@@ -192,10 +282,7 @@ void runtime_stamp(
     const char* text
 ) {
 
-    printf(
-        "%s\n",
-        text
-    );
+    printf("%s\n", text);
 
 }
 
@@ -210,10 +297,7 @@ char* runtime_input() {
     );
 
     buffer[
-        strcspn(
-            buffer,
-            "\n"
-        )
+        strcspn(buffer, "\n")
     ] = '\0';
 
     return buffer;
