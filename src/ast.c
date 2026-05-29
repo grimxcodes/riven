@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ast.h"
 
@@ -7,13 +9,17 @@ ASTNode* create_node(
 ) {
 
     ASTNode* node =
-        malloc(sizeof(ASTNode));
+        malloc(
+            sizeof(ASTNode)
+        );
 
     node->type = type;
 
     node->value = NULL;
 
     node->name = NULL;
+
+    node->extra = NULL;
 
     node->param_name = NULL;
 
@@ -25,9 +31,9 @@ ASTNode* create_node(
 
     node->third = NULL;
 
-    node->child_count = 0;
-
     node->children = NULL;
+
+    node->child_count = 0;
 
     return node;
 
@@ -42,8 +48,10 @@ ASTNode* create_array_node() {
 
     node->children =
         malloc(
-            sizeof(ASTNode*) * 100
+            sizeof(ASTNode*) * 1000
         );
+
+    node->child_count = 0;
 
     return node;
 
