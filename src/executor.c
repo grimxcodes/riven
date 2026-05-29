@@ -351,6 +351,64 @@ void execute(ASTNode* node) {
 
         }
 
+        case NODE_INCREMENT: {
+
+            char* value =
+                runtime_get_variable(
+                    node->name
+                );
+
+            int number =
+                atoi(value);
+
+            number++;
+
+            char buffer[100];
+
+            sprintf(
+                buffer,
+                "%d",
+                number
+            );
+
+            runtime_set_variable(
+                node->name,
+                buffer
+            );
+
+            break;
+
+        }
+
+        case NODE_DECREMENT: {
+
+            char* value =
+                runtime_get_variable(
+                    node->name
+                );
+
+            int number =
+                atoi(value);
+
+            number--;
+
+            char buffer[100];
+
+            sprintf(
+                buffer,
+                "%d",
+                number
+            );
+
+            runtime_set_variable(
+                node->name,
+                buffer
+            );
+
+            break;
+
+        }
+
         case NODE_STAMP: {
 
             if (
