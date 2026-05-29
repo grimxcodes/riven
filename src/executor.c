@@ -269,6 +269,48 @@ void execute(ASTNode* node) {
 
         }
 
+        case NODE_CONSTANT_ASSIGNMENT: {
+
+            runtime_set_constant(
+                node->name
+            );
+
+            if (
+                node->right->type ==
+                NODE_STRING
+            ) {
+
+                runtime_set_variable(
+                    node->name,
+                    node->right->value
+                );
+
+            }
+
+            else {
+
+                int result =
+                    eval(node->right);
+
+                char buffer[100];
+
+                sprintf(
+                    buffer,
+                    "%d",
+                    result
+                );
+
+                runtime_set_variable(
+                    node->name,
+                    buffer
+                );
+
+            }
+
+            break;
+
+        }
+
         case NODE_ASSIGNMENT: {
 
             if (
