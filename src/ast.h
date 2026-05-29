@@ -3,8 +3,6 @@
 
 typedef enum {
 
-    NODE_BLOCK,
-
     NODE_NUMBER,
     NODE_STRING,
 
@@ -13,24 +11,25 @@ typedef enum {
 
     NODE_BINARY,
 
+    NODE_BLOCK,
+
     NODE_STAMP,
     NODE_INPUT,
 
     NODE_IF,
+
     NODE_FLOW,
     NODE_WHILE,
+
+    NODE_ARRAY,
+    NODE_INDEX,
 
     NODE_FUNCTION,
     NODE_CALL,
     NODE_RETURN,
 
-    NODE_ARRAY,
-    NODE_INDEX,
-
     NODE_INCREMENT,
-    NODE_DECREMENT,
-
-    NODE_IMPORT
+    NODE_DECREMENT
 
 } NodeType;
 
