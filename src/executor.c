@@ -483,6 +483,17 @@ void execute(ASTNode* node) {
                         );
 
                     }
+                        else if (
+    node->right->type ==
+    NODE_OBJECT
+) {
+
+    runtime_create_object(
+        node->name,
+        node->right->name
+    );
+
+                        }
 
                     else {
 
