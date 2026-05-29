@@ -23,6 +23,17 @@ typedef struct {
 } Array;
 
 static Variable variables[1000];
+typedef struct {
+
+    char variable[100];
+
+    char frame[100];
+
+} Object;
+
+static Object objects[100];
+
+static int object_count = 0;
 
 static int variable_count = 0;
 
