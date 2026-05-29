@@ -61,6 +61,9 @@ static void skip_whitespace() {
 
 static void skip_single_comment() {
 
+    advance();
+    advance();
+
     while (
 
         current_char() != '\n' &&
@@ -558,9 +561,6 @@ Token get_next_token() {
 
     advance();
 
-    return make_token(
-        TOKEN_EOF,
-        "EOF"
-    );
+    return get_next_token();
 
 }
