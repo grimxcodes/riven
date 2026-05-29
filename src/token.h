@@ -25,6 +25,16 @@ typedef enum {
     TOKEN_CRAFT,
     TOKEN_RETURNS,
 
+    TOKEN_FRAME,
+    TOKEN_BOOT,
+
+    TOKEN_OPEN,
+    TOKEN_HIDDEN,
+
+    TOKEN_SPAWN,
+
+    TOKEN_REC,
+
     TOKEN_RISE,
     TOKEN_DROP,
 
@@ -42,6 +52,8 @@ typedef enum {
 
     TOKEN_ASSIGN,
     TOKEN_EQUAL_EQUAL,
+
+    TOKEN_DOT,
 
     TOKEN_LESS,
     TOKEN_GREATER,
