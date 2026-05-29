@@ -15,32 +15,48 @@ typedef enum {
 
     NODE_BINARY,
 
-    NODE_BLOCK,
-
     NODE_STAMP,
     NODE_INPUT,
 
     NODE_IF,
-
     NODE_FLOW,
     NODE_WHILE,
-
-    NODE_ARRAY,
-    NODE_INDEX,
-
-    NODE_RECORD,
 
     NODE_FUNCTION,
     NODE_CALL,
     NODE_RETURN,
 
+    NODE_INCREMENT,
+    NODE_DECREMENT,
+
+    NODE_ARRAY,
+    NODE_INDEX,
+
+    NODE_BLOCK,
+
     NODE_FRAME,
     NODE_OBJECT,
+    NODE_MEMBER,
 
-    NODE_METHOD_CALL,
+    NODE_RECORD,
 
-    NODE_INCREMENT,
-    NODE_DECREMENT
+    NODE_PTR,
+    NODE_REF,
+
+    NODE_RAW,
+
+    NODE_FETCH,
+
+    NODE_SPARK,
+    NODE_SYNC,
+
+    NODE_FILE,
+
+    NODE_CAST,
+
+    NODE_MEMBER_ASSIGNMENT,
+
+    NODE_METHOD_CALL
 
 } NodeType;
 
@@ -52,7 +68,7 @@ typedef struct ASTNode {
 
     char* name;
 
-    char* extra_name;
+    char* extra;
 
     char* param_name;
 
