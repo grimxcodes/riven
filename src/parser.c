@@ -117,10 +117,8 @@ static ASTNode* parse_factor() {
             );
 
         if (
-
             current_token.type ==
             TOKEN_CORRECT
-
         ) {
 
             node->value =
@@ -552,17 +550,6 @@ static ASTNode* parse_function() {
 
     advance();
 
-    if (
-        current_token.type !=
-        TOKEN_IDENTIFIER
-    ) {
-
-        error(
-            "Expected function name"
-        );
-
-    }
-
     ASTNode* node =
         create_node(
             NODE_FUNCTION
@@ -573,7 +560,9 @@ static ASTNode* parse_function() {
             current_token.value
         );
 
-    advance();
+    expect(
+        TOKEN_IDENTIFIER
+    );
 
     expect(
         TOKEN_LPAREN
@@ -598,19 +587,14 @@ static ASTNode* parse_function() {
 
             advance();
 
-            if (
-                current_token.type ==
+            node->param2_name =
+                strdup(
+                    current_token.value
+                );
+
+            expect(
                 TOKEN_IDENTIFIER
-            ) {
-
-                node->param2_name =
-                    strdup(
-                        current_token.value
-                    );
-
-                advance();
-
-            }
+            );
 
         }
 
@@ -647,17 +631,6 @@ static ASTNode* parse_frame() {
 
     advance();
 
-    if (
-        current_token.type !=
-        TOKEN_IDENTIFIER
-    ) {
-
-        error(
-            "Expected frame name"
-        );
-
-    }
-
     ASTNode* node =
         create_node(
             NODE_FRAME
@@ -668,7 +641,9 @@ static ASTNode* parse_frame() {
             current_token.value
         );
 
-    advance();
+    expect(
+        TOKEN_IDENTIFIER
+    );
 
     expect(
         TOKEN_LBRACE
@@ -823,17 +798,6 @@ static ASTNode* parse_statement() {
 
         advance();
 
-        if (
-            current_token.type !=
-            TOKEN_IDENTIFIER
-        ) {
-
-            error(
-                "Expected identifier"
-            );
-
-        }
-
         ASTNode* node =
             create_node(
                 NODE_CONSTANT_ASSIGNMENT
@@ -844,7 +808,9 @@ static ASTNode* parse_statement() {
                 current_token.value
             );
 
-        advance();
+        expect(
+            TOKEN_IDENTIFIER
+        );
 
         expect(
             TOKEN_ASSIGN
@@ -991,7 +957,9 @@ static ASTNode* parse_statement() {
                         current_token.value
                     );
 
-                advance();
+                expect(
+                    TOKEN_IDENTIFIER
+                );
 
                 expect(
                     TOKEN_LPAREN
@@ -1126,6 +1094,18 @@ ASTNode* parse_program() {
 
     advance();
 
+    ASTNode* program =
+        create_node(
+            NODE_BLOCK
+        );
+
+    program->children =
+        malloc(
+            sizeof(ASTNode*) * 2000
+        );
+
+    program->child_count = 0;
+
     while (
         current_token.type !=
         TOKEN_RIVEN
@@ -1134,7 +1114,13 @@ ASTNode* parse_program() {
         ASTNode* stmt =
             parse_statement();
 
-        (void)stmt;
+        if (stmt) {
+
+            program->children[
+                program->child_count++
+            ] = stmt;
+
+        }
 
     }
 
@@ -1144,6 +1130,21 @@ ASTNode* parse_program() {
         TOKEN_CORE
     );
 
-    return parse_block();
+    ASTNode* core =
+        parse_block();
+
+    for (
+        int i = 0;
+        i < core->child_count;
+        i++
+    ) {
+
+        program->children[
+            program->child_count++
+        ] = core->children[i];
+
+    }
+
+    return program;
 
 }
