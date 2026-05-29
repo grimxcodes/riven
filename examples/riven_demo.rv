@@ -1,30 +1,6 @@
-<<
-
-Riven Ultimate Demo
-Tests:
-- constants
-- arrays
-- loops
-- if/altif/else
-- functions
-- returns
-- booleans
-- increment/decrement
-- rise/drop
-- during loop
-- frame parsing
-- spawn validation
-- comments
-- imports
-
-Mini Project:
-Simple Todo Counter + Score System
-
->>
-
 consistof "system.rvh"
 
-firm app_version = 1
+firm version = 1
 
 craft add(a,b){
 
@@ -32,9 +8,9 @@ craft add(a,b){
 
 }
 
-craft multiply(a,b){
+craft sub(a,b){
 
-    returns a + b + b
+    returns a - b
 
 }
 
@@ -44,13 +20,13 @@ frame User {
 
     boot(){
 
-        stamp("User Started")
+        stamp("Booting User")
 
     }
 
     open login(){
 
-        stamp("Access Granted")
+        stamp("Login Success")
 
     }
 
@@ -60,145 +36,75 @@ riven core {
 
     stamp("=== RIVEN DEMO ===")
 
-    stamp(app_version)
+    score = 10
 
-    <<
+    stamp(score)
 
-    Array test
+    score+>
 
-    >>
+    stamp(score)
 
-    todos = [
+    rise score
 
-        10,
-        20,
-        30
+    stamp(score)
 
-    ]
+    drop score
 
-    stamp(todos[0])
+    stamp(score)
 
-    stamp(todos[1])
+    nums = [10,20,30]
 
-    stamp(todos[2])
+    stamp(nums[0])
 
-    ~~ counter test
+    stamp(nums[1])
 
-    total = 0
+    stamp(nums[2])
 
-    total+>
-
-    rise total
+    total = add(5,7)
 
     stamp(total)
 
-    drop total
+    value = sub(20,5)
 
-    stamp(total)
+    stamp(value)
 
-    if total > 5 {
+    if score > 5 and correct {
 
-        stamp("greater")
+        stamp("Condition True")
 
     }
 
-    altif total == 1 {
+    altif score == 5 {
 
-        stamp("equal one")
+        stamp("Equal")
 
     }
 
     else {
 
-        stamp("unknown")
+        stamp("False")
 
     }
 
-    count = 0
+    flow 3 {
 
-    flow 5 {
-
-        rise count
+        stamp("Flow Running")
 
     }
 
-    stamp(count)
+    counter = 0
 
-    number = 0
+    during counter < 3 {
 
-    during number < 3 {
+        rise counter
 
-        rise number
-
-        stamp(number)
+        stamp(counter)
 
     }
 
-    result = add(5,7)
+    user = spawn User()
 
-    stamp(result)
-
-    math = multiply(2,5)
-
-    stamp(math)
-
-    logic = correct
-
-    if logic and correct {
-
-        stamp("logic success")
-
-    }
-
-    player = spawn User()
-
-    stamp("frame registered")
-
-    stamp("=== TODO PROJECT ===")
-
-    completed = 0
-
-    task1 = correct
-    task2 = correct
-    task3 = incorrect
-
-    if task1 == correct {
-
-        rise completed
-
-    }
-
-    if task2 == correct {
-
-        rise completed
-
-    }
-
-    if task3 == correct {
-
-        rise completed
-
-    }
-
-    stamp(completed)
-
-    if completed == 3 {
-
-        stamp("all tasks complete")
-
-    }
-
-    altif completed == 2 {
-
-        stamp("almost done")
-
-    }
-
-    else {
-
-        stamp("keep working")
-
-    }
+    stamp("Spawn Success")
 
     stamp("=== END ===")
 
