@@ -34,7 +34,7 @@ frame User {
 
 riven core {
 
-    stamp("=== RIVEN DEMO ===")
+    stamp("RIVEN DEMO START")
 
     score = 10
 
@@ -74,15 +74,9 @@ riven core {
 
     }
 
-    altif score == 5 {
-
-        stamp("Equal")
-
-    }
-
     else {
 
-        stamp("False")
+        stamp("Condition False")
 
     }
 
@@ -106,6 +100,6 @@ riven core {
 
     stamp("Spawn Success")
 
-    stamp("=== END ===")
+    stamp("RIVEN DEMO END")
 
 }
