@@ -13,6 +13,16 @@ ASTNode* create_node(
             sizeof(ASTNode)
         );
 
+    if (!node) {
+
+        printf(
+            "AST allocation failed\n"
+        );
+
+        exit(1);
+
+    }
+
     node->type = type;
 
     node->value = NULL;
@@ -50,6 +60,16 @@ ASTNode* create_array_node() {
         malloc(
             sizeof(ASTNode*) * 1000
         );
+
+    if (!node->children) {
+
+        printf(
+            "Array allocation failed\n"
+        );
+
+        exit(1);
+
+    }
 
     node->child_count = 0;
 
