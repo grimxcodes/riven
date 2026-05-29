@@ -1,10 +1,6 @@
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-void runtime_stamp(
-    const char* text
-);
-
 void runtime_set_variable(
     const char* name,
     const char* value
@@ -13,8 +9,6 @@ void runtime_set_variable(
 char* runtime_get_variable(
     const char* name
 );
-
-char* runtime_input();
 
 void runtime_set_array(
     const char* name,
@@ -26,5 +20,11 @@ char* runtime_get_array(
     const char* name,
     int index
 );
+
+void runtime_stamp(
+    const char* text
+);
+
+char* runtime_input();
 
 #endif
