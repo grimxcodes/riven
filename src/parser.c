@@ -113,6 +113,48 @@ static ASTNode* parse_primary() {
 
         if (
             next_token.type ==
+            TOKEN_INCREMENT
+        ) {
+
+            ASTNode* node =
+                create_node(
+                    NODE_INCREMENT
+                );
+
+            node->name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+            eat(TOKEN_INCREMENT);
+
+            return node;
+
+        }
+
+        if (
+            next_token.type ==
+            TOKEN_DECREMENT
+        ) {
+
+            ASTNode* node =
+                create_node(
+                    NODE_DECREMENT
+                );
+
+            node->name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+            eat(TOKEN_DECREMENT);
+
+            return node;
+
+        }
+
+        if (
+            next_token.type ==
             TOKEN_LPAREN
         ) {
 
@@ -546,6 +588,42 @@ static ASTNode* parse_returns() {
 
 }
 
+static ASTNode* parse_rise() {
+
+    ASTNode* node =
+        create_node(
+            NODE_INCREMENT
+        );
+
+    eat(TOKEN_RISE);
+
+    node->name =
+        strdup(current_token.value);
+
+    eat(TOKEN_IDENTIFIER);
+
+    return node;
+
+}
+
+static ASTNode* parse_drop() {
+
+    ASTNode* node =
+        create_node(
+            NODE_DECREMENT
+        );
+
+    eat(TOKEN_DROP);
+
+    node->name =
+        strdup(current_token.value);
+
+    eat(TOKEN_IDENTIFIER);
+
+    return node;
+
+}
+
 static ASTNode* parse_statement() {
 
     if (
@@ -604,12 +682,32 @@ static ASTNode* parse_statement() {
 
     if (
         current_token.type ==
+        TOKEN_RISE
+    ) {
+
+        return parse_rise();
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_DROP
+    ) {
+
+        return parse_drop();
+
+    }
+
+    if (
+        current_token.type ==
         TOKEN_IDENTIFIER
     ) {
 
         if (
+
             next_token.type ==
             TOKEN_ASSIGN
+
         ) {
 
             return parse_assignment();
