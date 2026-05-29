@@ -9,7 +9,9 @@ typedef enum {
     NODE_NULL,
 
     NODE_VARIABLE,
+
     NODE_ASSIGNMENT,
+    NODE_CONSTANT_ASSIGNMENT,
 
     NODE_BINARY,
 
