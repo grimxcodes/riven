@@ -10,6 +10,10 @@ char* runtime_get_variable(
     const char* name
 );
 
+void runtime_set_constant(
+    const char* name
+);
+
 void runtime_set_array(
     const char* name,
     int index,
@@ -19,14 +23,6 @@ void runtime_set_array(
 char* runtime_get_array(
     const char* name,
     int index
-);
-
-void runtime_set_constant(
-    const char* name
-);
-
-int runtime_is_constant(
-    const char* name
 );
 
 void runtime_stamp(
