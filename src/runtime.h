@@ -27,6 +27,9 @@ char* runtime_get_array(
 
 void runtime_stamp(
     const char* text
+void runtime_create_object(
+    char* variable,
+    char* frame
 );
 
 char* runtime_input();
