@@ -28,9 +28,16 @@ typedef enum {
     NODE_ARRAY,
     NODE_INDEX,
 
+    NODE_RECORD,
+
     NODE_FUNCTION,
     NODE_CALL,
     NODE_RETURN,
+
+    NODE_FRAME,
+    NODE_OBJECT,
+
+    NODE_METHOD_CALL,
 
     NODE_INCREMENT,
     NODE_DECREMENT
@@ -44,6 +51,8 @@ typedef struct ASTNode {
     char* value;
 
     char* name;
+
+    char* extra_name;
 
     char* param_name;
 
