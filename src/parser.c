@@ -88,6 +88,95 @@ static ASTNode* parse_primary() {
 
     if (
         current_token.type ==
+        TOKEN_CORRECT
+    ) {
+
+        ASTNode* node =
+            create_node(
+                NODE_BOOLEAN
+            );
+
+        node->value =
+            strdup("1");
+
+        eat(TOKEN_CORRECT);
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_INCORRECT
+    ) {
+
+        ASTNode* node =
+            create_node(
+                NODE_BOOLEAN
+            );
+
+        node->value =
+            strdup("0");
+
+        eat(TOKEN_INCORRECT);
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_EMP
+    ) {
+
+        ASTNode* node =
+            create_node(
+                NODE_NULL
+            );
+
+        node->value =
+            strdup("0");
+
+        eat(TOKEN_EMP);
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
+        TOKEN_NOT
+    ) {
+
+        eat(TOKEN_NOT);
+
+        ASTNode* node =
+            create_node(
+                NODE_BINARY
+            );
+
+        node->value =
+            strdup("==");
+
+        node->left =
+            parse_primary();
+
+        ASTNode* zero =
+            create_node(
+                NODE_NUMBER
+            );
+
+        zero->value =
+            strdup("0");
+
+        node->right = zero;
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
         TOKEN_GRAB
     ) {
 
