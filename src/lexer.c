@@ -24,6 +24,12 @@ static char current_char() {
 
 }
 
+static char peek_char() {
+
+    return source[position + 1];
+
+}
+
 static void advance() {
 
     if (
@@ -40,7 +46,7 @@ static void skip_whitespace() {
 
     while (
 
-        current_char() == ' ' ||
+        current_char() == ' '  ||
         current_char() == '\n' ||
         current_char() == '\t' ||
         current_char() == '\r'
@@ -53,7 +59,7 @@ static void skip_whitespace() {
 
 }
 
-static void skip_comment() {
+static void skip_single_comment() {
 
     while (
 
@@ -62,6 +68,39 @@ static void skip_comment() {
 
     ) {
 
+        advance();
+
+    }
+
+}
+
+static void skip_multi_comment() {
+
+    advance();
+    advance();
+
+    while (
+
+        !(
+
+            current_char() == '>' &&
+            peek_char() == '>'
+
+        ) &&
+
+        current_char() != '\0'
+
+    ) {
+
+        advance();
+
+    }
+
+    if (
+        current_char() == '>'
+    ) {
+
+        advance();
         advance();
 
     }
@@ -123,7 +162,10 @@ static Token number_token() {
     int i = 0;
 
     while (
-        isdigit(current_char())
+
+        isdigit(current_char()) ||
+        current_char() == '.'
+
     ) {
 
         buffer[i++] =
@@ -173,14 +215,17 @@ static Token identifier_token() {
     if (strcmp(buffer, "stamp") == 0)
         return make_token(TOKEN_STAMP, buffer);
 
-    if (strcmp(buffer, "input") == 0)
-        return make_token(TOKEN_INPUT, buffer);
+    if (strcmp(buffer, "grab") == 0)
+        return make_token(TOKEN_GRAB, buffer);
 
     if (strcmp(buffer, "consistof") == 0)
-        return make_token(TOKEN_IMPORT, buffer);
+        return make_token(TOKEN_CONSISTOF, buffer);
 
     if (strcmp(buffer, "if") == 0)
         return make_token(TOKEN_IF, buffer);
+
+    if (strcmp(buffer, "altif") == 0)
+        return make_token(TOKEN_ALTIF, buffer);
 
     if (strcmp(buffer, "else") == 0)
         return make_token(TOKEN_ELSE, buffer);
@@ -188,11 +233,23 @@ static Token identifier_token() {
     if (strcmp(buffer, "flow") == 0)
         return make_token(TOKEN_FLOW, buffer);
 
+    if (strcmp(buffer, "during") == 0)
+        return make_token(TOKEN_DURING, buffer);
+
     if (strcmp(buffer, "craft") == 0)
         return make_token(TOKEN_CRAFT, buffer);
 
-    if (strcmp(buffer, "return") == 0)
-        return make_token(TOKEN_RETURN, buffer);
+    if (strcmp(buffer, "returns") == 0)
+        return make_token(TOKEN_RETURNS, buffer);
+
+    if (strcmp(buffer, "and") == 0)
+        return make_token(TOKEN_AND, buffer);
+
+    if (strcmp(buffer, "or") == 0)
+        return make_token(TOKEN_OR, buffer);
+
+    if (strcmp(buffer, "not") == 0)
+        return make_token(TOKEN_NOT, buffer);
 
     return make_token(
         TOKEN_IDENTIFIER,
@@ -208,10 +265,26 @@ Token get_next_token() {
         skip_whitespace();
 
         if (
-            current_char() == '#'
+
+            current_char() == '~' &&
+            peek_char() == '~'
+
         ) {
 
-            skip_comment();
+            skip_single_comment();
+
+            continue;
+
+        }
+
+        if (
+
+            current_char() == '<' &&
+            peek_char() == '<'
+
+        ) {
+
+            skip_multi_comment();
 
             continue;
 
@@ -232,7 +305,11 @@ Token get_next_token() {
 
     }
 
-    if (isdigit(c)) {
+    if (
+
+        isdigit(c)
+
+    ) {
 
         return number_token();
 
@@ -252,6 +329,153 @@ Token get_next_token() {
     if (c == '"') {
 
         return string_token();
+
+    }
+
+    if (
+
+        c == '+' &&
+        peek_char() == '>'
+
+    ) {
+
+        advance();
+        advance();
+
+        return make_token(
+            TOKEN_INCREMENT,
+            "+>"
+        );
+
+    }
+
+    if (
+
+        c == '-' &&
+        peek_char() == '<'
+
+    ) {
+
+        advance();
+        advance();
+
+        return make_token(
+            TOKEN_DECREMENT,
+            "-<"
+        );
+
+    }
+
+    if (
+
+        c == '&' &&
+        peek_char() == '&'
+
+    ) {
+
+        advance();
+        advance();
+
+        return make_token(
+            TOKEN_AND_SYMBOL,
+            "&&"
+        );
+
+    }
+
+    if (
+
+        c == '|' &&
+        peek_char() == '|'
+
+    ) {
+
+        advance();
+        advance();
+
+        return make_token(
+            TOKEN_OR_SYMBOL,
+            "||"
+        );
+
+    }
+
+    if (c == '!') {
+
+        advance();
+
+        return make_token(
+            TOKEN_NOT_SYMBOL,
+            "!"
+        );
+
+    }
+
+    if (c == '=') {
+
+        advance();
+
+        if (
+            current_char() == '='
+        ) {
+
+            advance();
+
+            return make_token(
+                TOKEN_EQUAL_EQUAL,
+                "=="
+            );
+
+        }
+
+        return make_token(
+            TOKEN_ASSIGN,
+            "="
+        );
+
+    }
+
+    if (c == '+') {
+
+        advance();
+
+        return make_token(
+            TOKEN_PLUS,
+            "+"
+        );
+
+    }
+
+    if (c == '-') {
+
+        advance();
+
+        return make_token(
+            TOKEN_MINUS,
+            "-"
+        );
+
+    }
+
+    if (c == '<') {
+
+        advance();
+
+        return make_token(
+            TOKEN_LESS,
+            "<"
+        );
+
+    }
+
+    if (c == '>') {
+
+        advance();
+
+        return make_token(
+            TOKEN_GREATER,
+            ">"
+        );
 
     }
 
@@ -328,74 +552,6 @@ Token get_next_token() {
         return make_token(
             TOKEN_COMMA,
             ","
-        );
-
-    }
-
-    if (c == '+') {
-
-        advance();
-
-        return make_token(
-            TOKEN_PLUS,
-            "+"
-        );
-
-    }
-
-    if (c == '-') {
-
-        advance();
-
-        return make_token(
-            TOKEN_MINUS,
-            "-"
-        );
-
-    }
-
-    if (c == '<') {
-
-        advance();
-
-        return make_token(
-            TOKEN_LESS,
-            "<"
-        );
-
-    }
-
-    if (c == '>') {
-
-        advance();
-
-        return make_token(
-            TOKEN_GREATER,
-            ">"
-        );
-
-    }
-
-    if (c == '=') {
-
-        advance();
-
-        if (
-            current_char() == '='
-        ) {
-
-            advance();
-
-            return make_token(
-                TOKEN_EQUAL_EQUAL,
-                "=="
-            );
-
-        }
-
-        return make_token(
-            TOKEN_ASSIGN,
-            "="
         );
 
     }
