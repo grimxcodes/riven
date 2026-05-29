@@ -3,7 +3,7 @@
 
 #include "token.h"
 
-void init_lexer(const char* source);
+void init_lexer(char* text);
 
 Token get_next_token();
 
