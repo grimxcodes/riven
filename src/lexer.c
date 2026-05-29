@@ -249,6 +249,15 @@ static Token identifier_token() {
     if (strcmp(buffer, "drop") == 0)
         return make_token(TOKEN_DROP, buffer);
 
+    if (strcmp(buffer, "correct") == 0)
+        return make_token(TOKEN_CORRECT, buffer);
+
+    if (strcmp(buffer, "incorrect") == 0)
+        return make_token(TOKEN_INCORRECT, buffer);
+
+    if (strcmp(buffer, "emp") == 0)
+        return make_token(TOKEN_EMP, buffer);
+
     if (strcmp(buffer, "and") == 0)
         return make_token(TOKEN_AND, buffer);
 
