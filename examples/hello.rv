@@ -1,31 +1,21 @@
-consistof "std.rvh"
-
-~~ comment
-
-craft add(a,b){
-
-    returns a+b
-
-}
-
 riven core {
 
-    score = 0
+    active = correct
 
-    score+>
+    failed = incorrect
 
-    stamp(score)
+    data = emp
 
-    score-<
+    if active {
 
-    stamp(score)
+        stamp("active works")
 
-    rise score
+    }
 
-    stamp(score)
+    if not failed {
 
-    drop score
+        stamp("not works")
 
-    stamp(score)
+    }
 
 }
