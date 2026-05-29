@@ -16,15 +16,15 @@ void init_lexer(char* text) {
 
 }
 
-static char current_char() {
+static unsigned char current_char() {
 
-    return source[index_pos];
+    return (unsigned char)source[index_pos];
 
 }
 
-static char peek_char() {
+static unsigned char peek_char() {
 
-    return source[index_pos + 1];
+    return (unsigned char)source[index_pos + 1];
 
 }
 
@@ -50,7 +50,15 @@ static void skip_spaces() {
 
         current_char() == '\t' ||
 
-        current_char() == '\r'
+        current_char() == '\r' ||
+
+        current_char() == 160 ||
+
+        current_char() == 239 ||
+
+        current_char() == 187 ||
+
+        current_char() == 191
 
     ) {
 
@@ -61,10 +69,8 @@ static void skip_spaces() {
 }
 
 static Token make_token(
-
     TokenType type,
     const char* value
-
 ) {
 
     Token token;
@@ -164,8 +170,8 @@ static Token read_identifier() {
     buffer[i] = '\0';
 
     #define KEYWORD(word, token) \
-        if (strcmp(buffer, word) == 0) \
-            return make_token(token, buffer);
+    if (strcmp(buffer, word) == 0) \
+    return make_token(token, buffer);
 
     KEYWORD("if", TOKEN_IF)
     KEYWORD("altif", TOKEN_ALTIF)
@@ -639,12 +645,7 @@ Token get_next_token() {
 
         }
 
-        printf(
-            "Unknown character: %c\n",
-            current_char()
-        );
-
-        exit(1);
+        advance();
 
     }
 
