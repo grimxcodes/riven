@@ -110,6 +110,14 @@ static int eval(ASTNode* node) {
 
             return atoi(node->value);
 
+        case NODE_BOOLEAN:
+
+            return atoi(node->value);
+
+        case NODE_NULL:
+
+            return 0;
+
         case NODE_VARIABLE: {
 
             char* value =
