@@ -286,6 +286,8 @@ static int eval(ASTNode* node) {
 
                     }
 
+                    return_value = 0;
+
                     execute(
                         functions[i].body
                     );
@@ -355,11 +357,61 @@ void execute(ASTNode* node) {
 
         }
 
-        case NODE_CONSTANT_ASSIGNMENT: {
+        case NODE_FUNCTION: {
 
-            runtime_set_constant(
+            strcpy(
+
+                functions[
+                    function_count
+                ].name,
+
                 node->name
+
             );
+
+            if (
+                node->param_name
+            ) {
+
+                strcpy(
+
+                    functions[
+                        function_count
+                    ].param1,
+
+                    node->param_name
+
+                );
+
+            }
+
+            if (
+                node->param2_name
+            ) {
+
+                strcpy(
+
+                    functions[
+                        function_count
+                    ].param2,
+
+                    node->param2_name
+
+                );
+
+            }
+
+            functions[
+                function_count
+            ].body = node->right;
+
+            function_count++;
+
+            break;
+
+        }
+
+        case NODE_CONSTANT_ASSIGNMENT: {
 
             if (
                 node->right->type ==
@@ -392,6 +444,10 @@ void execute(ASTNode* node) {
                 );
 
             }
+
+            runtime_set_constant(
+                node->name
+            );
 
             break;
 
@@ -674,60 +730,6 @@ void execute(ASTNode* node) {
                 );
 
             }
-
-            break;
-
-        }
-
-        case NODE_FUNCTION: {
-
-            strcpy(
-
-                functions[
-                    function_count
-                ].name,
-
-                node->name
-
-            );
-
-            if (
-                node->param_name
-            ) {
-
-                strcpy(
-
-                    functions[
-                        function_count
-                    ].param1,
-
-                    node->param_name
-
-                );
-
-            }
-
-            if (
-                node->param2_name
-            ) {
-
-                strcpy(
-
-                    functions[
-                        function_count
-                    ].param2,
-
-                    node->param2_name
-
-                );
-
-            }
-
-            functions[
-                function_count
-            ].body = node->right;
-
-            function_count++;
 
             break;
 
