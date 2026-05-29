@@ -1,14 +1,18 @@
 consistof "std.rvh"
 
-~~
-
-single line comment
+~~ single line comment
 
 <<
 
 multi line comment
 
 >>
+
+craft add(a,b){
+
+    returns a+b
+
+}
 
 craft multiply(a,b){
 
