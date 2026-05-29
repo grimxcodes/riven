@@ -22,6 +22,12 @@ static char current_char() {
 
 }
 
+static char peek_char() {
+
+    return source[index_pos + 1];
+
+}
+
 static void advance() {
 
     if (
@@ -100,443 +106,6 @@ static Token read_number() {
 
 }
 
-static Token read_identifier() {
-
-    char buffer[256];
-
-    int i = 0;
-
-    while (
-
-        isalnum(current_char()) ||
-
-        current_char() == '_'
-
-    ) {
-
-        buffer[i++] =
-            current_char();
-
-        advance();
-
-    }
-
-    buffer[i] = '\0';
-
-    if (
-        strcmp(buffer, "if") == 0
-    ) {
-
-        return make_token(
-            TOKEN_IF,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "altif") == 0
-    ) {
-
-        return make_token(
-            TOKEN_ALTIF,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "else") == 0
-    ) {
-
-        return make_token(
-            TOKEN_ELSE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "flow") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FLOW,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "during") == 0
-    ) {
-
-        return make_token(
-            TOKEN_DURING,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "craft") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CRAFT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "returns") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RETURNS,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "riven") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RIVEN,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "core") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CORE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "stamp") == 0
-    ) {
-
-        return make_token(
-            TOKEN_STAMP,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "grab") == 0
-    ) {
-
-        return make_token(
-            TOKEN_GRAB,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "correct") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CORRECT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "incorrect") == 0
-    ) {
-
-        return make_token(
-            TOKEN_INCORRECT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "emp") == 0
-    ) {
-
-        return make_token(
-            TOKEN_EMP,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "firm") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FIRM,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "rise") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RISE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "drop") == 0
-    ) {
-
-        return make_token(
-            TOKEN_DROP,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "frame") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FRAME,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "boot") == 0
-    ) {
-
-        return make_token(
-            TOKEN_BOOT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "open") == 0
-    ) {
-
-        return make_token(
-            TOKEN_OPEN,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "hidden") == 0
-    ) {
-
-        return make_token(
-            TOKEN_HIDDEN,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "spawn") == 0
-    ) {
-
-        return make_token(
-            TOKEN_SPAWN,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "consistof") == 0
-    ) {
-
-        return make_token(
-            TOKEN_CONSISTOF,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "and") == 0
-    ) {
-
-        return make_token(
-            TOKEN_AND,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "or") == 0
-    ) {
-
-        return make_token(
-            TOKEN_OR,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "not") == 0
-    ) {
-
-        return make_token(
-            TOKEN_NOT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "rec") == 0
-    ) {
-
-        return make_token(
-            TOKEN_REC,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "ptr") == 0
-    ) {
-
-        return make_token(
-            TOKEN_PTR,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "ref") == 0
-    ) {
-
-        return make_token(
-            TOKEN_REF,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "raw") == 0
-    ) {
-
-        return make_token(
-            TOKEN_RAW,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "fetch") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FETCH,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "spark") == 0
-    ) {
-
-        return make_token(
-            TOKEN_SPARK,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "sync") == 0
-    ) {
-
-        return make_token(
-            TOKEN_SYNC,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "file") == 0
-    ) {
-
-        return make_token(
-            TOKEN_FILE,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "int") == 0
-    ) {
-
-        return make_token(
-            TOKEN_INT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "txt") == 0
-    ) {
-
-        return make_token(
-            TOKEN_TXT,
-            buffer
-        );
-
-    }
-
-    if (
-        strcmp(buffer, "dnum") == 0
-    ) {
-
-        return make_token(
-            TOKEN_DNUM,
-            buffer
-        );
-
-    }
-
-    return make_token(
-        TOKEN_IDENTIFIER,
-        buffer
-    );
-
-}
-
 static Token read_string() {
 
     char buffer[1024];
@@ -571,6 +140,98 @@ static Token read_string() {
 
 }
 
+static Token read_identifier() {
+
+    char buffer[256];
+
+    int i = 0;
+
+    while (
+
+        isalnum(current_char()) ||
+
+        current_char() == '_'
+
+    ) {
+
+        buffer[i++] =
+            current_char();
+
+        advance();
+
+    }
+
+    buffer[i] = '\0';
+
+    #define KEYWORD(word, token) \
+        if (strcmp(buffer, word) == 0) \
+            return make_token(token, buffer);
+
+    KEYWORD("if", TOKEN_IF)
+    KEYWORD("altif", TOKEN_ALTIF)
+    KEYWORD("else", TOKEN_ELSE)
+
+    KEYWORD("flow", TOKEN_FLOW)
+    KEYWORD("during", TOKEN_DURING)
+
+    KEYWORD("craft", TOKEN_CRAFT)
+    KEYWORD("returns", TOKEN_RETURNS)
+
+    KEYWORD("riven", TOKEN_RIVEN)
+    KEYWORD("core", TOKEN_CORE)
+
+    KEYWORD("stamp", TOKEN_STAMP)
+    KEYWORD("grab", TOKEN_GRAB)
+
+    KEYWORD("correct", TOKEN_CORRECT)
+    KEYWORD("incorrect", TOKEN_INCORRECT)
+
+    KEYWORD("emp", TOKEN_EMP)
+
+    KEYWORD("firm", TOKEN_FIRM)
+
+    KEYWORD("rise", TOKEN_RISE)
+    KEYWORD("drop", TOKEN_DROP)
+
+    KEYWORD("frame", TOKEN_FRAME)
+    KEYWORD("boot", TOKEN_BOOT)
+
+    KEYWORD("open", TOKEN_OPEN)
+    KEYWORD("hidden", TOKEN_HIDDEN)
+
+    KEYWORD("spawn", TOKEN_SPAWN)
+
+    KEYWORD("consistof", TOKEN_CONSISTOF)
+
+    KEYWORD("and", TOKEN_AND)
+    KEYWORD("or", TOKEN_OR)
+    KEYWORD("not", TOKEN_NOT)
+
+    KEYWORD("rec", TOKEN_REC)
+
+    KEYWORD("ptr", TOKEN_PTR)
+    KEYWORD("ref", TOKEN_REF)
+
+    KEYWORD("raw", TOKEN_RAW)
+
+    KEYWORD("fetch", TOKEN_FETCH)
+
+    KEYWORD("spark", TOKEN_SPARK)
+    KEYWORD("sync", TOKEN_SYNC)
+
+    KEYWORD("file", TOKEN_FILE)
+
+    KEYWORD("int", TOKEN_INT)
+    KEYWORD("txt", TOKEN_TXT)
+    KEYWORD("dnum", TOKEN_DNUM)
+
+    return make_token(
+        TOKEN_IDENTIFIER,
+        buffer
+    );
+
+}
+
 Token get_next_token() {
 
     while (
@@ -578,6 +239,14 @@ Token get_next_token() {
     ) {
 
         skip_spaces();
+
+        if (
+            current_char() == '\0'
+        ) {
+
+            break;
+
+        }
 
         if (
             isdigit(current_char())
@@ -588,9 +257,11 @@ Token get_next_token() {
         }
 
         if (
+
             isalpha(current_char()) ||
 
             current_char() == '_'
+
         ) {
 
             return read_identifier();
@@ -609,7 +280,7 @@ Token get_next_token() {
 
             current_char() == '~' &&
 
-            source[index_pos + 1] == '~'
+            peek_char() == '~'
 
         ) {
 
@@ -633,7 +304,7 @@ Token get_next_token() {
 
             current_char() == '<' &&
 
-            source[index_pos + 1] == '<'
+            peek_char() == '<'
 
         ) {
 
@@ -646,7 +317,7 @@ Token get_next_token() {
 
                     current_char() == '>' &&
 
-                    source[index_pos + 1] == '>'
+                    peek_char() == '>'
 
                 ) &&
 
@@ -658,8 +329,14 @@ Token get_next_token() {
 
             }
 
-            advance();
-            advance();
+            if (
+                current_char() != '\0'
+            ) {
+
+                advance();
+                advance();
+
+            }
 
             continue;
 
@@ -670,7 +347,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '>'
+                peek_char() == '>'
             ) {
 
                 advance();
@@ -697,7 +374,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '<'
+                peek_char() == '<'
             ) {
 
                 advance();
@@ -750,7 +427,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '='
+                peek_char() == '='
             ) {
 
                 advance();
@@ -777,7 +454,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '='
+                peek_char() == '='
             ) {
 
                 advance();
@@ -823,7 +500,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '&'
+                peek_char() == '&'
             ) {
 
                 advance();
@@ -843,7 +520,7 @@ Token get_next_token() {
         ) {
 
             if (
-                source[index_pos + 1] == '|'
+                peek_char() == '|'
             ) {
 
                 advance();
