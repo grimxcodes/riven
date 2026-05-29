@@ -1,37 +1,31 @@
 <<
 
-Riven v1 test
+Frame system test
 
 >>
 
+consistof "system.rvh"
+
+frame User {
+
+    hidden password = 1234
+
+    boot(){
+
+        stamp("User Booted")
+
+    }
+
+    open login(){
+
+        stamp("Access Granted")
+
+    }
+
+}
+
 riven core {
 
-    firm version = 1
-
-    stamp(version)
-
-    nums = [10,20,30]
-
-    stamp(nums[0])
-
-    stamp(nums[1])
-
-    stamp(nums[2])
-
-    score = 0
-
-    flow 3 {
-
-        score+>
-
-    }
-
-    stamp(score)
-
-    if score > 2 and correct {
-
-        stamp("logic works")
-
-    }
+    stamp("frame parser works")
 
 }
