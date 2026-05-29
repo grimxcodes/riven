@@ -60,6 +60,22 @@ static int eval_binary(ASTNode* node) {
     }
 
     if (
+        strcmp(node->value, "*") == 0
+    ) {
+
+        return left * right;
+
+    }
+
+    if (
+        strcmp(node->value, "/") == 0
+    ) {
+
+        return left / right;
+
+    }
+
+    if (
         strcmp(node->value, "<") == 0
     ) {
 
@@ -80,6 +96,14 @@ static int eval_binary(ASTNode* node) {
     ) {
 
         return left == right;
+
+    }
+
+    if (
+        strcmp(node->value, "!=") == 0
+    ) {
+
+        return left != right;
 
     }
 
