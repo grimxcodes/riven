@@ -7,13 +7,11 @@
 #include "token.h"
 
 static const char* source;
-
 static int position = 0;
 
 void init_lexer(const char* text) {
 
     source = text;
-
     position = 0;
 
 }
@@ -245,6 +243,12 @@ static Token identifier_token() {
     if (strcmp(buffer, "returns") == 0)
         return make_token(TOKEN_RETURNS, buffer);
 
+    if (strcmp(buffer, "rise") == 0)
+        return make_token(TOKEN_RISE, buffer);
+
+    if (strcmp(buffer, "drop") == 0)
+        return make_token(TOKEN_DROP, buffer);
+
     if (strcmp(buffer, "and") == 0)
         return make_token(TOKEN_AND, buffer);
 
@@ -309,9 +313,7 @@ Token get_next_token() {
     }
 
     if (
-
         isdigit(c)
-
     ) {
 
         return number_token();
