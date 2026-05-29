@@ -73,6 +73,24 @@ typedef enum {
     TOKEN_HIDDEN,
     TOKEN_SPAWN,
 
+    TOKEN_REC,
+
+    TOKEN_PTR,
+    TOKEN_REF,
+
+    TOKEN_RAW,
+
+    TOKEN_FETCH,
+
+    TOKEN_SPARK,
+    TOKEN_SYNC,
+
+    TOKEN_FILE,
+
+    TOKEN_INT,
+    TOKEN_TXT,
+    TOKEN_DNUM,
+
     TOKEN_CONSISTOF,
 
     TOKEN_EOF
