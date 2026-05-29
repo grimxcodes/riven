@@ -1,20 +1,36 @@
+<<
+
+Riven v1 test
+
+>>
+
 riven core {
 
-    active = correct
+    firm version = 1
 
-    failed = incorrect
+    stamp(version)
 
-    data = emp
+    nums = [10,20,30]
 
-    if active {
+    stamp(nums[0])
 
-        stamp("active works")
+    stamp(nums[1])
+
+    stamp(nums[2])
+
+    score = 0
+
+    flow 3 {
+
+        score+>
 
     }
 
-    if not failed {
+    stamp(score)
 
-        stamp("not works")
+    if score > 2 and correct {
+
+        stamp("logic works")
 
     }
 
