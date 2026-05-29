@@ -21,6 +21,14 @@ char* runtime_get_array(
     int index
 );
 
+void runtime_set_constant(
+    const char* name
+);
+
+int runtime_is_constant(
+    const char* name
+);
+
 void runtime_stamp(
     const char* text
 );
