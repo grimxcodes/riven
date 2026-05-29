@@ -145,6 +145,38 @@ static ASTNode* parse_primary() {
 
     if (
         current_token.type ==
+        TOKEN_NOT
+    ) {
+
+        eat(TOKEN_NOT);
+
+        ASTNode* node =
+            create_node(
+                NODE_BINARY
+            );
+
+        node->value =
+            strdup("==");
+
+        node->left =
+            parse_primary();
+
+        ASTNode* zero =
+            create_node(
+                NODE_NUMBER
+            );
+
+        zero->value =
+            strdup("0");
+
+        node->right = zero;
+
+        return node;
+
+    }
+
+    if (
+        current_token.type ==
         TOKEN_GRAB
     ) {
 
@@ -226,6 +258,32 @@ static ASTNode* parse_primary() {
 
             eat(TOKEN_IDENTIFIER);
             eat(TOKEN_DECREMENT);
+
+            return node;
+
+        }
+
+        if (
+            next_token.type ==
+            TOKEN_DOT
+        ) {
+
+            ASTNode* node =
+                create_node(
+                    NODE_MEMBER
+                );
+
+            node->name =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
+
+            eat(TOKEN_DOT);
+
+            node->value =
+                strdup(current_token.value);
+
+            eat(TOKEN_IDENTIFIER);
 
             return node;
 
@@ -376,6 +434,12 @@ static ASTNode* parse_expression() {
         TOKEN_MINUS ||
 
         current_token.type ==
+        TOKEN_MULTIPLY ||
+
+        current_token.type ==
+        TOKEN_DIVIDE ||
+
+        current_token.type ==
         TOKEN_LESS ||
 
         current_token.type ==
@@ -383,6 +447,9 @@ static ASTNode* parse_expression() {
 
         current_token.type ==
         TOKEN_EQUAL_EQUAL ||
+
+        current_token.type ==
+        TOKEN_NOT_EQUAL ||
 
         current_token.type ==
         TOKEN_AND ||
@@ -755,11 +822,7 @@ static ASTNode* parse_frame() {
 
             eat(TOKEN_HIDDEN);
 
-            eat(TOKEN_IDENTIFIER);
-
-            eat(TOKEN_ASSIGN);
-
-            parse_expression();
+            parse_assignment();
 
         }
 
