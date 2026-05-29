@@ -25,6 +25,9 @@ typedef enum {
     TOKEN_CRAFT,
     TOKEN_RETURNS,
 
+    TOKEN_RISE,
+    TOKEN_DROP,
+
     TOKEN_PLUS,
     TOKEN_MINUS,
 
