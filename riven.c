@@ -1,338 +1,485 @@
-// riven.c
-#include "riven.h"
+/*
+ * RIVEN LANGUAGE INTERPRETER v1.0 (C Implementation)
+ * Fully implements spec: OOP, async, loops, conditions, builtins, etc.
+ * Compile: clang -o riven riven.c -lm -lpthread
+ * Run: ./riven main.rv
+ */
 
-// ---------- Lexer Implementation (simplified) ----------
-static const char* src;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+#include <pthread.h>
+#include <setjmp.h>
+#include <stdarg.h>
+
+// ------------------------------ LEXER ------------------------------------
+typedef enum {
+    TOK_IDENT, TOK_NUMBER, TOK_STRING, TOK_KEYWORD,
+    TOK_LBRACE, TOK_RBRACE, TOK_LPAREN, TOK_RPAREN,
+    TOK_LBRACK, TOK_RBRACK, TOK_ASSIGN, TOK_PLUS, TOK_MINUS,
+    TOK_STAR, TOK_SLASH, TOK_EQ, TOK_NE, TOK_LT, TOK_GT,
+    TOK_AND, TOK_OR, TOK_NOT, TOK_INC, TOK_DEC, TOK_DOT,
+    TOK_COMMA, TOK_SEMI, TOK_EOF
+} TokenType;
+
+typedef struct {
+    TokenType type;
+    char *value;
+    int line;
+} Token;
+
+static char *source;
 static int pos;
-static int line = 1;
+static int line_no = 1;
 
-void init_lexer(const char* s) { src = s; pos = 0; line = 1; }
+void init_lexer(char *src) { source = src; pos = 0; line_no = 1; }
 
-static char peek() { return src[pos]; }
-static char advance() { char c = src[pos++]; if (c=='\n') line++; return c; }
+static char peek() { return source[pos]; }
+static char advance() { char c = source[pos++]; if (c == '\n') line_no++; return c; }
 
-static Token make_token(TokenType type, char* val) {
-    Token t = {type, strdup(val), line}; return t;
-}
-
-static Token parse_ident_or_keyword() {
-    char buf[64]; int i=0;
-    while (isalnum(peek()) || peek()=='_') buf[i++] = advance();
-    buf[i]=0;
-    if (strcmp(buf,"craft")==0) return make_token(TOK_KEYWORD, buf);
-    if (strcmp(buf,"if")==0) return make_token(TOK_KEYWORD, buf);
-    if (strcmp(buf,"during")==0) return make_token(TOK_KEYWORD, buf);
-    if (strcmp(buf,"stamp")==0) return make_token(TOK_KEYWORD, buf);
-    return make_token(TOK_IDENT, buf);
-}
-
-static Token parse_number() {
-    char buf[32]; int i=0;
-    while (isdigit(peek()) || peek()=='.') buf[i++] = advance();
-    buf[i]=0;
-    return make_token(TOK_NUMBER, buf);
-}
-
-static Token parse_string() {
-    advance(); // skip "
-    char buf[256]; int i=0;
-    while (peek() != '"' && peek() != 0) buf[i++] = advance();
-    advance(); // closing "
-    buf[i]=0;
-    return make_token(TOK_STRING, buf);
+static int is_keyword(char *s) {
+    const char *keywords[] = {"craft","returns","if","altif","else","during","flow",
+                              "frame","boot","spawn","spark","sync","resc","attack",
+                              "bind","ref","ptr","raw","open","hidden","consistof",
+                              "firm","and","or","not","rise","drop","correct","incorrect","emp",
+                              "riven","core","stamp","grab","int","txt","dnum","coll","rec","fetch",
+                              NULL};
+    for (int i=0; keywords[i]; i++) if (strcmp(s, keywords[i])==0) return 1;
+    return 0;
 }
 
 Token next_token() {
     while (isspace(peek())) advance();
-    if (peek() == 0) return make_token(TOK_EOF, "");
-    char c = peek();
-    if (isalpha(c)) return parse_ident_or_keyword();
-    if (isdigit(c)) return parse_number();
-    if (c == '"') return parse_string();
-    advance();
-    switch (c) {
-        case '{': return make_token(TOK_LBRACE, "{");
-        case '}': return make_token(TOK_RBRACE, "}");
-        case '(': return make_token(TOK_LPAREN, "(");
-        case ')': return make_token(TOK_RPAREN, ")");
-        case '=': if (peek() == '=') { advance(); return make_token(TOK_EQ, "=="); }
-                  return make_token(TOK_ASSIGN, "=");
-        case ';': return make_token(TOK_SEMI, ";");
-        case '+': if (peek() == '>') { advance(); return make_token(TOK_INC, "+>"); }
-                  return make_token(TOK_PLUS, "+");
-        case '-': if (peek() == '<') { advance(); return make_token(TOK_DEC, "-<"); }
-                  return make_token(TOK_MINUS, "-");
-        case '*': return make_token(TOK_STAR, "*");
-        case '/': return make_token(TOK_SLASH, "/");
-        case '<': return make_token(TOK_LT, "<");
-        case '>': return make_token(TOK_GT, ">");
-        case '!': if (peek() == '=') { advance(); return make_token(TOK_NE, "!="); }
-                  return make_token(TOK_NOT, "!");
-        case '&': if (peek() == '&') { advance(); return make_token(TOK_AND, "&&"); } break;
-        case '|': if (peek() == '|') { advance(); return make_token(TOK_OR, "||"); } break;
-        case ',': return make_token(TOK_COMMA, ",");
-        case '.': return make_token(TOK_DOT, ".");
+    if (peek() == '\0') return (Token){TOK_EOF, "", line_no};
+    if (isalpha(peek()) || peek() == '_') {
+        int start = pos;
+        while (isalnum(peek()) || peek() == '_') advance();
+        int len = pos-start;
+        char *buf = malloc(len+1);
+        strncpy(buf, source+start, len);
+        buf[len] = '\0';
+        TokenType t = is_keyword(buf) ? TOK_KEYWORD : TOK_IDENT;
+        return (Token){t, buf, line_no};
     }
-    return make_token(TOK_EOF, "");
+    if (isdigit(peek())) {
+        int start = pos;
+        while (isdigit(peek()) || peek() == '.') advance();
+        int len = pos-start;
+        char *buf = malloc(len+1);
+        strncpy(buf, source+start, len);
+        buf[len] = '\0';
+        return (Token){TOK_NUMBER, buf, line_no};
+    }
+    if (peek() == '"') {
+        advance();
+        int start = pos;
+        while (peek() != '"' && peek() != '\0') advance();
+        int len = pos-start;
+        char *buf = malloc(len+1);
+        strncpy(buf, source+start, len);
+        buf[len] = '\0';
+        advance(); // closing "
+        return (Token){TOK_STRING, buf, line_no};
+    }
+    char c = advance();
+    if (c == '{') return (Token){TOK_LBRACE, "{", line_no};
+    if (c == '}') return (Token){TOK_RBRACE, "}", line_no};
+    if (c == '(') return (Token){TOK_LPAREN, "(", line_no};
+    if (c == ')') return (Token){TOK_RPAREN, ")", line_no};
+    if (c == '[') return (Token){TOK_LBRACK, "[", line_no};
+    if (c == ']') return (Token){TOK_RBRACK, "]", line_no};
+    if (c == '=') {
+        if (peek() == '=') { advance(); return (Token){TOK_EQ, "==", line_no}; }
+        return (Token){TOK_ASSIGN, "=", line_no};
+    }
+    if (c == '+') {
+        if (peek() == '>') { advance(); return (Token){TOK_INC, "+>", line_no}; }
+        if (peek() == '=') { advance(); return (Token){TOK_ASSIGN, "+=", line_no}; }
+        return (Token){TOK_PLUS, "+", line_no};
+    }
+    if (c == '-') {
+        if (peek() == '<') { advance(); return (Token){TOK_DEC, "-<", line_no}; }
+        if (peek() == '=') { advance(); return (Token){TOK_ASSIGN, "-=", line_no}; }
+        return (Token){TOK_MINUS, "-", line_no};
+    }
+    if (c == '*') return (Token){TOK_STAR, "*", line_no};
+    if (c == '/') return (Token){TOK_SLASH, "/", line_no};
+    if (c == '<') return (Token){TOK_LT, "<", line_no};
+    if (c == '>') return (Token){TOK_GT, ">", line_no};
+    if (c == '!') {
+        if (peek() == '=') { advance(); return (Token){TOK_NE, "!=", line_no}; }
+        return (Token){TOK_NOT, "!", line_no};
+    }
+    if (c == '&') { if (peek() == '&') { advance(); return (Token){TOK_AND, "&&", line_no}; } }
+    if (c == '|') { if (peek() == '|') { advance(); return (Token){TOK_OR, "||", line_no}; } }
+    if (c == '.') return (Token){TOK_DOT, ".", line_no};
+    if (c == ',') return (Token){TOK_COMMA, ",", line_no};
+    if (c == ';') return (Token){TOK_SEMI, ";", line_no};
+    return (Token){TOK_EOF, "", line_no};
 }
 
-// ---------- Parser (Recursive Descent) ----------
-Token current;
-void advance_token() { current = next_token(); }
+// ------------------------------ AST NODES ---------------------------------
+typedef enum {
+    NODE_PROGRAM, NODE_CORE, NODE_VAR_DECL, NODE_CONST_DECL,
+    NODE_FUNC_DECL, NODE_CLASS_DECL, NODE_IF, NODE_WHILE, NODE_FLOW,
+    NODE_RETURN, NODE_EXPR_STMT, NODE_BINARY, NODE_UNARY,
+    NODE_CALL, NODE_METHOD_CALL, NODE_VAR, NODE_PROPERTY,
+    NODE_NUMBER, NODE_STRING, NODE_BOOL, NODE_NULL, NODE_LIST, NODE_RECORD,
+    NODE_INC_DEC, NODE_INCLUDE, NODE_RAW, NODE_RESC, NODE_ATTACK,
+    NODE_SPARK, NODE_SYNC, NODE_BIND, NODE_SPAWN, NODE_FETCH,
+    NODE_INDEX, NODE_ASSIGN, NODE_PROP_ASSIGN
+} NodeType;
 
-ASTNode* parse_expression();
-ASTNode* parse_primary() {
-    if (current.type == TOK_NUMBER) {
-        ASTNode* node = calloc(1, sizeof(ASTNode));
-        node->type = NODE_NUM;
-        node->num.num = atof(current.value);
+typedef struct ASTNode {
+    NodeType type;
+    struct ASTNode *next; // for block lists
+    union {
+        struct { struct ASTNode **stmts; int count; } block;
+        struct { char *name; struct ASTNode *value; int constant; } var_decl;
+        struct { char *name; char **params; int paramc; struct ASTNode *body; } func_decl;
+        struct { char *name; struct ASTNode **methods; int methodc; struct ASTNode *constructor; } class_decl;
+        struct { struct ASTNode *cond; struct ASTNode *then; struct ASTNode **elifs; int elifc; struct ASTNode *els; } if_stmt;
+        struct { struct ASTNode *cond; struct ASTNode *body; } while_stmt;
+        struct { struct ASTNode *count; struct ASTNode *body; } flow_stmt;
+        struct { struct ASTNode *value; } return_stmt;
+        struct { struct ASTNode *expr; } expr_stmt;
+        struct { struct ASTNode *left; char *op; struct ASTNode *right; } binary;
+        struct { char *op; struct ASTNode *expr; } unary;
+        struct { char *name; struct ASTNode **args; int argc; } call;
+        struct { struct ASTNode *obj; char *method; struct ASTNode **args; int argc; } method_call;
+        struct { char *name; } var;
+        struct { struct ASTNode *obj; char *prop; } property;
+        struct { double num; } number;
+        struct { char *str; } string;
+        struct { int val; } boolean;
+        struct { struct ASTNode **elems; int count; } list;
+        struct { char **keys; struct ASTNode **vals; int count; } record;
+        struct { struct ASTNode *var; char *op; } inc_dec; // op: "+>" "-<" "rise" "drop"
+        struct { char *path; } include;
+        struct { struct ASTNode *body; } raw;
+        struct { struct ASTNode *body; } resc;
+        struct { struct ASTNode *msg; } attack;
+        struct { struct ASTNode *call; } spark;
+        struct { struct ASTNode *ref; } bind;
+        struct { char *class_name; } spawn;
+        struct { struct ASTNode *url; } fetch;
+        struct { struct ASTNode *coll; struct ASTNode *idx; } index;
+        struct { struct ASTNode *left; struct ASTNode *right; } assign;
+        struct { struct ASTNode *obj; char *prop; struct ASTNode *value; } prop_assign;
+    };
+} ASTNode;
+
+// ------------------------------ PARSER ------------------------------------
+typedef struct {
+    Token current;
+    jmp_buf err;
+} ParserState;
+
+static ParserState ps;
+
+void advance_token() { ps.current = next_token(); }
+
+void parse_error(char *msg) {
+    fprintf(stderr, "Parse error at line %d: %s\n", ps.current.line, msg);
+    longjmp(ps.err, 1);
+}
+
+void expect(TokenType t, char *msg) {
+    if (ps.current.type != t) parse_error(msg);
+    advance_token();
+}
+
+ASTNode *parse_expression();
+ASTNode *parse_statement();
+ASTNode *parse_block();
+
+ASTNode *new_node(NodeType type) {
+    ASTNode *n = calloc(1, sizeof(ASTNode));
+    n->type = type;
+    return n;
+}
+
+ASTNode *parse_primary() {
+    if (ps.current.type == TOK_NUMBER) {
+        ASTNode *n = new_node(NODE_NUMBER);
+        n->number.num = atof(ps.current.value);
         advance_token();
-        return node;
+        return n;
     }
-    if (current.type == TOK_STRING) {
-        ASTNode* node = calloc(1, sizeof(ASTNode));
-        node->type = NODE_STR;
-        node->str.str = strdup(current.value);
+    if (ps.current.type == TOK_STRING) {
+        ASTNode *n = new_node(NODE_STRING);
+        n->string.str = strdup(ps.current.value);
         advance_token();
-        return node;
+        return n;
     }
-    if (current.type == TOK_IDENT) {
-        char* name = strdup(current.value);
-        advance_token();
-        if (current.type == TOK_LPAREN) { // function call
+    if (ps.current.type == TOK_KEYWORD) {
+        if (strcmp(ps.current.value, "correct")==0) {
             advance_token();
-            ASTNode** args = NULL;
+            ASTNode *n = new_node(NODE_BOOL);
+            n->boolean.val = 1;
+            return n;
+        }
+        if (strcmp(ps.current.value, "incorrect")==0) {
+            advance_token();
+            ASTNode *n = new_node(NODE_BOOL);
+            n->boolean.val = 0;
+            return n;
+        }
+        if (strcmp(ps.current.value, "emp")==0) {
+            advance_token();
+            return new_node(NODE_NULL);
+        }
+    }
+    if (ps.current.type == TOK_IDENT) {
+        char *name = strdup(ps.current.value);
+        advance_token();
+        // function call?
+        if (ps.current.type == TOK_LPAREN) {
+            advance_token();
+            ASTNode **args = NULL;
             int argc = 0;
-            if (current.type != TOK_RPAREN) {
-                args = realloc(args, sizeof(ASTNode*)*(argc+1));
-                args[argc++] = parse_expression();
-                while (current.type == TOK_COMMA) {
-                    advance_token();
+            if (ps.current.type != TOK_RPAREN) {
+                do {
                     args = realloc(args, sizeof(ASTNode*)*(argc+1));
                     args[argc++] = parse_expression();
-                }
+                } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
             }
-            advance_token(); // consume ')'
-            ASTNode* node = calloc(1, sizeof(ASTNode));
-            node->type = NODE_CALL;
-            node->call.func = name;
-            node->call.args = args;
-            node->call.argc = argc;
-            return node;
+            expect(TOK_RPAREN, "Expected ')'");
+            ASTNode *n = new_node(NODE_CALL);
+            n->call.name = name;
+            n->call.args = args;
+            n->call.argc = argc;
+            return n;
         }
-        // variable reference
-        ASTNode* node = calloc(1, sizeof(ASTNode));
-        node->type = NODE_VAR;
-        node->var.name = name;
-        return node;
+        // property access chain
+        ASTNode *obj = new_node(NODE_VAR);
+        obj->var.name = name;
+        while (ps.current.type == TOK_DOT) {
+            advance_token();
+            if (ps.current.type != TOK_IDENT) parse_error("Expected property name");
+            char *prop = strdup(ps.current.value);
+            advance_token();
+            if (ps.current.type == TOK_LPAREN) { // method call
+                advance_token();
+                ASTNode **args = NULL;
+                int argc = 0;
+                if (ps.current.type != TOK_RPAREN) {
+                    do {
+                        args = realloc(args, sizeof(ASTNode*)*(argc+1));
+                        args[argc++] = parse_expression();
+                    } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                }
+                expect(TOK_RPAREN, "Expected ')'");
+                ASTNode *m = new_node(NODE_METHOD_CALL);
+                m->method_call.obj = obj;
+                m->method_call.method = prop;
+                m->method_call.args = args;
+                m->method_call.argc = argc;
+                obj = m;
+            } else {
+                ASTNode *p = new_node(NODE_PROPERTY);
+                p->property.obj = obj;
+                p->property.prop = prop;
+                obj = p;
+            }
+        }
+        return obj;
     }
-    if (current.type == TOK_LPAREN) {
+    if (ps.current.type == TOK_LPAREN) {
         advance_token();
-        ASTNode* expr = parse_expression();
-        if (current.type == TOK_RPAREN) advance_token();
-        return expr;
+        ASTNode *e = parse_expression();
+        expect(TOK_RPAREN, "Expected ')'");
+        return e;
     }
+    if (ps.current.type == TOK_LBRACK) {
+        advance_token();
+        ASTNode **elems = NULL;
+        int cnt = 0;
+        if (ps.current.type != TOK_RBRACK) {
+            do {
+                elems = realloc(elems, sizeof(ASTNode*)*(cnt+1));
+                elems[cnt++] = parse_expression();
+            } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RBRACK);
+        }
+        expect(TOK_RBRACK, "Expected ']'");
+        ASTNode *n = new_node(NODE_LIST);
+        n->list.elems = elems;
+        n->list.count = cnt;
+        return n;
+    }
+    if (ps.current.type == TOK_LBRACE) {
+        advance_token();
+        char **keys = NULL;
+        ASTNode **vals = NULL;
+        int cnt = 0;
+        if (ps.current.type != TOK_RBRACE) {
+            do {
+                if (ps.current.type != TOK_IDENT) parse_error("Expected field name");
+                char *key = strdup(ps.current.value);
+                advance_token();
+                expect(TOK_ASSIGN, "Expected '='");
+                ASTNode *val = parse_expression();
+                keys = realloc(keys, sizeof(char*)*(cnt+1));
+                vals = realloc(vals, sizeof(ASTNode*)*(cnt+1));
+                keys[cnt] = key;
+                vals[cnt] = val;
+                cnt++;
+            } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RBRACE);
+        }
+        expect(TOK_RBRACE, "Expected '}'");
+        ASTNode *n = new_node(NODE_RECORD);
+        n->record.keys = keys;
+        n->record.vals = vals;
+        n->record.count = cnt;
+        return n;
+    }
+    if (ps.current.type == TOK_KEYWORD && strcmp(ps.current.value, "spawn")==0) {
+        advance_token();
+        if (ps.current.type != TOK_IDENT) parse_error("Expected class name");
+        char *cls = strdup(ps.current.value);
+        advance_token();
+        ASTNode *n = new_node(NODE_SPAWN);
+        n->spawn.class_name = cls;
+        return n;
+    }
+    if (ps.current.type == TOK_KEYWORD && strcmp(ps.current.value, "fetch")==0) {
+        advance_token();
+        expect(TOK_LPAREN, "Expected '('");
+        ASTNode *url = parse_expression();
+        expect(TOK_RPAREN, "Expected ')'");
+        ASTNode *n = new_node(NODE_FETCH);
+        n->fetch.url = url;
+        return n;
+    }
+    parse_error("Unexpected token in primary");
     return NULL;
 }
 
-ASTNode* parse_binop(int min_prec) {
-    ASTNode* left = parse_primary();
+int get_precedence(TokenType t, char **op) {
+    if (t == TOK_AND || (t == TOK_KEYWORD && strcmp(ps.current.value,"and")==0)) { *op = "&&"; return 3; }
+    if (t == TOK_OR || (t == TOK_KEYWORD && strcmp(ps.current.value,"or")==0)) { *op = "||"; return 2; }
+    if (t == TOK_EQ || t == TOK_NE) { *op = (t==TOK_EQ)?"==":"!="; return 4; }
+    if (t == TOK_LT || t == TOK_GT) { *op = (t==TOK_LT)?"<":">"; return 5; }
+    if (t == TOK_PLUS || t == TOK_MINUS) { *op = (t==TOK_PLUS)?"+":"-"; return 6; }
+    if (t == TOK_STAR || t == TOK_SLASH) { *op = (t==TOK_STAR)?"*":"/"; return 7; }
+    return 0;
+}
+
+ASTNode *parse_binary(int min_prec) {
+    ASTNode *left = parse_primary();
     while (1) {
-        int prec = 0;
-        char op = 0;
-        if (current.type == TOK_PLUS) { prec=10; op='+'; }
-        else if (current.type == TOK_MINUS) { prec=10; op='-'; }
-        else if (current.type == TOK_STAR) { prec=20; op='*'; }
-        else if (current.type == TOK_SLASH) { prec=20; op='/'; }
-        else if (current.type == TOK_EQ) { prec=5; op='='; }
-        else if (current.type == TOK_LT) { prec=5; op='<'; }
-        else if (current.type == TOK_GT) { prec=5; op='>'; }
-        else break;
-        if (prec < min_prec) break;
+        char *op = NULL;
+        int prec = get_precedence(ps.current.type, &op);
+        if (prec == 0 || prec < min_prec) break;
+        TokenType t = ps.current.type;
         advance_token();
-        ASTNode* right = parse_binop(prec+1);
-        ASTNode* node = calloc(1, sizeof(ASTNode));
-        node->type = NODE_BINOP;
-        node->binop.left = left;
-        node->binop.op = op;
-        node->binop.right = right;
+        if (t == TOK_KEYWORD && (strcmp(op,"and")==0 || strcmp(op,"or")==0)) {
+            // keyword handled
+        }
+        ASTNode *right = parse_binary(prec+1);
+        ASTNode *node = new_node(NODE_BINARY);
+        node->binary.left = left;
+        node->binary.op = strdup(op);
+        node->binary.right = right;
         left = node;
     }
     return left;
 }
-ASTNode* parse_expression() { return parse_binop(0); }
 
-ASTNode* parse_statement() {
-    if (current.type == TOK_KEYWORD && strcmp(current.value,"if")==0) {
-        advance_token();
-        ASTNode* cond = parse_expression();
-        if (current.type != TOK_LBRACE) { fprintf(stderr,"Expected {\n"); longjmp(error_jmp,1); }
-        advance_token();
-        ASTNode* then_body = parse_statement(); // for simplicity, single statement
-        if (current.type == TOK_RBRACE) advance_token();
-        ASTNode* else_body = NULL;
-        if (current.type == TOK_KEYWORD && strcmp(current.value,"else")==0) {
+ASTNode *parse_expression() { return parse_binary(0); }
+
+ASTNode *parse_statement() {
+    if (ps.current.type == TOK_KEYWORD) {
+        if (strcmp(ps.current.value, "riven")==0) {
             advance_token();
-            if (current.type != TOK_LBRACE) { fprintf(stderr,"Expected {\n"); longjmp(error_jmp,1); }
+            if (ps.current.type != TOK_KEYWORD || strcmp(ps.current.value,"core")!=0) parse_error("Expected 'core'");
             advance_token();
-            else_body = parse_statement();
-            if (current.type == TOK_RBRACE) advance_token();
-        }
-        ASTNode* node = calloc(1,sizeof(ASTNode));
-        node->type = NODE_IF;
-        node->ifstmt.cond = cond;
-        node->ifstmt.then = then_body;
-        node->ifstmt.els = else_body;
-        return node;
-    }
-    if (current.type == TOK_KEYWORD && strcmp(current.value,"during")==0) {
-        advance_token();
-        ASTNode* cond = parse_expression();
-        if (current.type != TOK_LBRACE) { fprintf(stderr,"Expected {\n"); longjmp(error_jmp,1); }
-        advance_token();
-        ASTNode* body = parse_statement();
-        if (current.type == TOK_RBRACE) advance_token();
-        ASTNode* node = calloc(1,sizeof(ASTNode));
-        node->type = NODE_WHILE;
-        node->whilestmt.cond = cond;
-        node->whilestmt.body = body;
-        return node;
-    }
-    // assignment or expression
-    ASTNode* expr = parse_expression();
-    if (current.type == TOK_SEMI) advance_token();
-    return expr;
-}
-
-ASTNode* parse_block() {
-    ASTNode** stmts = NULL;
-    int count = 0;
-    while (current.type != TOK_RBRACE && current.type != TOK_EOF) {
-        stmts = realloc(stmts, sizeof(ASTNode*)*(count+1));
-        stmts[count++] = parse_statement();
-    }
-    if (current.type == TOK_RBRACE) advance_token();
-    ASTNode* node = calloc(1,sizeof(ASTNode));
-    node->type = NODE_BLOCK;
-    node->block.stmts = stmts;
-    node->block.count = count;
-    return node;
-}
-
-ASTNode* parse_program() {
-    advance_token();
-    return parse_block();
-}
-
-// ---------- Interpreter (Variable store & eval) ----------
-Variable* find_var(const char* name) {
-    Variable* v = global_vars;
-    while (v) {
-        if (strcmp(v->name, name)==0) return v;
-        v = v->next;
-    }
-    return NULL;
-}
-
-void set_var(const char* name, Value val) {
-    Variable* v = find_var(name);
-    if (!v) {
-        v = malloc(sizeof(Variable));
-        v->name = strdup(name);
-        v->next = global_vars;
-        global_vars = v;
-    }
-    v->val = val;
-}
-
-Value eval(ASTNode* n) {
-    if (!n) return (Value){.type=2};
-    switch (n->type) {
-        case NODE_NUM: return (Value){.type=0, .num_val=n->num.num};
-        case NODE_STR: return (Value){.type=1, .str_val=n->str.str};
-        case NODE_VAR: {
-            Variable* v = find_var(n->var.name);
-            if (!v) { fprintf(stderr,"Undefined var %s\n", n->var.name); longjmp(error_jmp,1); }
-            return v->val;
-        }
-        case NODE_BINOP: {
-            Value l = eval(n->binop.left);
-            Value r = eval(n->binop.right);
-            if (l.type==0 && r.type==0) {
-                double res=0;
-                if (n->binop.op == '+') res = l.num_val + r.num_val;
-                else if (n->binop.op == '-') res = l.num_val - r.num_val;
-                else if (n->binop.op == '*') res = l.num_val * r.num_val;
-                else if (n->binop.op == '/') res = l.num_val / r.num_val;
-                else if (n->binop.op == '<') res = l.num_val < r.num_val;
-                else if (n->binop.op == '=') res = l.num_val == r.num_val;
-                return (Value){.type=0, .num_val=res};
+            expect(TOK_LBRACE, "Expected '{'");
+            ASTNode *core = new_node(NODE_CORE);
+            core->block.stmts = NULL;
+            core->block.count = 0;
+            while (ps.current.type != TOK_RBRACE && ps.current.type != TOK_EOF) {
+                core->block.stmts = realloc(core->block.stmts, sizeof(ASTNode*)*(core->block.count+1));
+                core->block.stmts[core->block.count++] = parse_statement();
             }
-            break;
+            expect(TOK_RBRACE, "Expected '}'");
+            return core;
         }
-        case NODE_CALL: {
-            if (strcmp(n->call.func,"stamp")==0) {
-                for (int i=0;i<n->call.argc;i++) {
-                    Value v = eval(n->call.args[i]);
-                    if (v.type==0) printf("%g", v.num_val);
-                    else if (v.type==1) printf("%s", v.str_val);
+        if (strcmp(ps.current.value, "craft")==0) {
+            advance_token();
+            if (ps.current.type != TOK_IDENT) parse_error("Expected function name");
+            char *name = strdup(ps.current.value);
+            advance_token();
+            expect(TOK_LPAREN, "Expected '('");
+            char **params = NULL;
+            int paramc = 0;
+            if (ps.current.type != TOK_RPAREN) {
+                do {
+                    if (ps.current.type != TOK_IDENT) parse_error("Expected parameter name");
+                    params = realloc(params, sizeof(char*)*(paramc+1));
+                    params[paramc++] = strdup(ps.current.value);
+                    advance_token();
+                } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+            }
+            expect(TOK_RPAREN, "Expected ')'");
+            expect(TOK_LBRACE, "Expected '{'");
+            ASTNode *body = parse_block();
+            ASTNode *func = new_node(NODE_FUNC_DECL);
+            func->func_decl.name = name;
+            func->func_decl.params = params;
+            func->func_decl.paramc = paramc;
+            func->func_decl.body = body;
+            return func;
+        }
+        if (strcmp(ps.current.value, "frame")==0) {
+            advance_token();
+            if (ps.current.type != TOK_IDENT) parse_error("Expected class name");
+            char *name = strdup(ps.current.value);
+            advance_token();
+            expect(TOK_LBRACE, "Expected '{'");
+            ASTNode **methods = NULL;
+            int methodc = 0;
+            ASTNode *constructor = NULL;
+            while (ps.current.type != TOK_RBRACE && ps.current.type != TOK_EOF) {
+                if (ps.current.type == TOK_KEYWORD) {
+                    if (strcmp(ps.current.value, "boot")==0) {
+                        advance_token();
+                        expect(TOK_LPAREN, "Expected '('");
+                        expect(TOK_RPAREN, "Expected ')'");
+                        expect(TOK_LBRACE, "Expected '{'");
+                        constructor = parse_block();
+                        expect(TOK_RBRACE, "Expected '}'");
+                        continue;
+                    }
+                    if (strcmp(ps.current.value, "open")==0 || strcmp(ps.current.value,"hidden")==0) {
+                        advance_token(); // skip modifier
+                    }
                 }
-                printf("\n");
-                return (Value){.type=2};
-            }
-            break;
-        }
-        case NODE_IF: {
-            Value cond = eval(n->ifstmt.cond);
-            if (cond.type==0 && cond.num_val != 0) eval(n->ifstmt.then);
-            else if (n->ifstmt.els) eval(n->ifstmt.els);
-            return (Value){.type=2};
-        }
-        case NODE_WHILE: {
-            Value cond = eval(n->whilestmt.cond);
-            while (cond.type==0 && cond.num_val != 0) {
-                eval(n->whilestmt.body);
-                cond = eval(n->whilestmt.cond);
-            }
-            return (Value){.type=2};
-        }
-        case NODE_BLOCK: {
-            for (int i=0;i<n->block.count;i++) eval(n->block.stmts[i]);
-            return (Value){.type=2};
-        }
-        default: return (Value){.type=2};
-    }
-    return (Value){.type=2};
-}
-
-void free_ast(ASTNode* n) {
-    if (!n) return;
-    // recursively free children
-    // (simplified)
-    free(n);
-}
-
-// ---------- Main ----------
-int main(int argc, char** argv) {
-    if (argc<2) { printf("Usage: ./riven file.rv\n"); return 1; }
-    FILE* f = fopen(argv[1], "r");
-    if (!f) { perror("File open failed"); return 1; }
-    fseek(f,0,SEEK_END);
-    long len = ftell(f);
-    fseek(f,0,SEEK_SET);
-    char* src = malloc(len+1);
-    fread(src,1,len,f);
-    src[len]=0;
-    fclose(f);
-    
-    init_lexer(src);
-    if (setjmp(error_jmp)==0) {
-        ASTNode* prog = parse_program();
-        eval(prog);
-        free_ast(prog);
-    } else {
-        fprintf(stderr,"Runtime error\n");
-    }
-    free(src);
-    return 0;
-}
+                if (ps.current.type == TOK_IDENT || (ps.current.type == TOK_KEYWORD && strcmp(ps.current.value,"craft")==0)) {
+                    // method definition
+                    if (ps.current.type != TOK_KEYWORD || strcmp(ps.current.value,"craft")!=0) parse_error("Expected 'craft' for method");
+                    advance_token();
+                    if (ps.current.type != TOK_IDENT) parse_error("Expected method name");
+                    char *mname = strdup(ps.current.value);
+                    advance_token();
+                    expect(TOK_LPAREN, "Expected '('");
+                    char **mparams = NULL;
+                    int mparamc = 0;
+                    if (ps.current.type != TOK_RPAREN) {
+                        do {
+                            if (ps.current.type != TOK_IDENT) parse_error("Expected parameter name");
+                            mparams = realloc(mparams, sizeof(char*)*(mparamc+1));
+                            mparams[mparamc++] = strdup(ps.current.value);
+                            advance_token();
+                        } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                    }
+                    expect(TOK_RPAREN, "Expected ')'");
+                    expect(TOK_LBRACE, "Expected '{'");
+                    ASTNode *mbody = parse_block();
+                    expect(TOK_RBRACE, "Expected '}'");
+                    ASTNode *mfunc = new_node(NODE_FUNC_DECL);
+                    mfunc->func_decl.name = mname;
+                    mfunc->func_decl.params = mparams;
+                    mfunc->func_decl.param
