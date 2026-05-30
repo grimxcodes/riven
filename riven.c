@@ -1,8 +1,6 @@
 /*
- * RIVEN LANGUAGE INTERPRETER v1.0 (C Implementation)
- * Fully implements spec: OOP, async, loops, conditions, builtins, etc.
- * Compile: clang -o riven riven.c -lm -lpthread
- * Run: ./riven main.rv
+ * RIVEN LANGUAGE INTERPRETER v1.0 (Fixed)
+ * Compile: clang -o riven riven.c -lpthread -lm
  */
 
 #include <stdio.h>
@@ -12,7 +10,6 @@
 #include <math.h>
 #include <pthread.h>
 #include <setjmp.h>
-#include <stdarg.h>
 
 // ------------------------------ LEXER ------------------------------------
 typedef enum {
@@ -134,7 +131,7 @@ typedef enum {
 
 typedef struct ASTNode {
     NodeType type;
-    struct ASTNode *next; // for block lists
+    struct ASTNode *next;
     union {
         struct { struct ASTNode **stmts; int count; } block;
         struct { char *name; struct ASTNode *value; int constant; } var_decl;
@@ -156,7 +153,7 @@ typedef struct ASTNode {
         struct { int val; } boolean;
         struct { struct ASTNode **elems; int count; } list;
         struct { char **keys; struct ASTNode **vals; int count; } record;
-        struct { struct ASTNode *var; char *op; } inc_dec; // op: "+>" "-<" "rise" "drop"
+        struct { struct ASTNode *var; char *op; } inc_dec;
         struct { char *path; } include;
         struct { struct ASTNode *body; } raw;
         struct { struct ASTNode *body; } resc;
@@ -201,6 +198,7 @@ ASTNode *new_node(NodeType type) {
     return n;
 }
 
+// ----- parse_primary and helpers -----
 ASTNode *parse_primary() {
     if (ps.current.type == TOK_NUMBER) {
         ASTNode *n = new_node(NODE_NUMBER);
@@ -244,7 +242,8 @@ ASTNode *parse_primary() {
                 do {
                     args = realloc(args, sizeof(ASTNode*)*(argc+1));
                     args[argc++] = parse_expression();
-                } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                } while (ps.current.type == TOK_COMMA);
+                if (ps.current.type == TOK_COMMA) advance_token();
             }
             expect(TOK_RPAREN, "Expected ')'");
             ASTNode *n = new_node(NODE_CALL);
@@ -269,7 +268,8 @@ ASTNode *parse_primary() {
                     do {
                         args = realloc(args, sizeof(ASTNode*)*(argc+1));
                         args[argc++] = parse_expression();
-                    } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                    } while (ps.current.type == TOK_COMMA);
+                    if (ps.current.type == TOK_COMMA) advance_token();
                 }
                 expect(TOK_RPAREN, "Expected ')'");
                 ASTNode *m = new_node(NODE_METHOD_CALL);
@@ -301,7 +301,8 @@ ASTNode *parse_primary() {
             do {
                 elems = realloc(elems, sizeof(ASTNode*)*(cnt+1));
                 elems[cnt++] = parse_expression();
-            } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RBRACK);
+            } while (ps.current.type == TOK_COMMA);
+            if (ps.current.type == TOK_COMMA) advance_token();
         }
         expect(TOK_RBRACK, "Expected ']'");
         ASTNode *n = new_node(NODE_LIST);
@@ -326,7 +327,8 @@ ASTNode *parse_primary() {
                 keys[cnt] = key;
                 vals[cnt] = val;
                 cnt++;
-            } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RBRACE);
+            } while (ps.current.type == TOK_COMMA);
+            if (ps.current.type == TOK_COMMA) advance_token();
         }
         expect(TOK_RBRACE, "Expected '}'");
         ASTNode *n = new_node(NODE_RECORD);
@@ -373,11 +375,7 @@ ASTNode *parse_binary(int min_prec) {
         char *op = NULL;
         int prec = get_precedence(ps.current.type, &op);
         if (prec == 0 || prec < min_prec) break;
-        TokenType t = ps.current.type;
         advance_token();
-        if (t == TOK_KEYWORD && (strcmp(op,"and")==0 || strcmp(op,"or")==0)) {
-            // keyword handled
-        }
         ASTNode *right = parse_binary(prec+1);
         ASTNode *node = new_node(NODE_BINARY);
         node->binary.left = left;
@@ -421,7 +419,8 @@ ASTNode *parse_statement() {
                     params = realloc(params, sizeof(char*)*(paramc+1));
                     params[paramc++] = strdup(ps.current.value);
                     advance_token();
-                } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                } while (ps.current.type == TOK_COMMA);
+                if (ps.current.type == TOK_COMMA) advance_token();
             }
             expect(TOK_RPAREN, "Expected ')'");
             expect(TOK_LBRACE, "Expected '{'");
@@ -473,7 +472,8 @@ ASTNode *parse_statement() {
                             mparams = realloc(mparams, sizeof(char*)*(mparamc+1));
                             mparams[mparamc++] = strdup(ps.current.value);
                             advance_token();
-                        } while (ps.current.type == TOK_COMMA && advance_token(), ps.current.type != TOK_RPAREN);
+                        } while (ps.current.type == TOK_COMMA);
+                        if (ps.current.type == TOK_COMMA) advance_token();
                     }
                     expect(TOK_RPAREN, "Expected ')'");
                     expect(TOK_LBRACE, "Expected '{'");
@@ -482,4 +482,7 @@ ASTNode *parse_statement() {
                     ASTNode *mfunc = new_node(NODE_FUNC_DECL);
                     mfunc->func_decl.name = mname;
                     mfunc->func_decl.params = mparams;
-                    mfunc->func_decl.param
+                    mfunc->func_decl.paramc = mparamc;
+                    mfunc->func_decl.body = mbody;
+                    methods = realloc(methods, sizeof(ASTNode*)*(methodc+1));
+                    methods[methodc++] = mfunc;
