@@ -1,0 +1,10 @@
+stamp("Hello Riven")
+a = 10
+b = 20
+c = a + b
+stamp("Sum = ", c)
+if c > 30 { stamp("Big") } else { stamp("Small") }
+during a > 0 {
+    stamp(a)
+    a = a - 1
+}
